@@ -23,9 +23,9 @@
 	<script type="text/javascript">
 		$(function(){
 			//页面加载获取市场活动列表信息，
-			pageList(1,3);
+			pageList(1,5);
 
-			//打开创建市场活动窗口，
+			//打开【创建】市场活动窗口，
 			$("#addBtn").click(function () {
 				/*
 				为创建按钮绑定事件，打开添加操作的模态窗口。
@@ -83,7 +83,7 @@
 					success:function (data) {
 						if (data.success){
 
-							pageList(1,3);
+							pageList(1,$("#activityPage").bs_pagination('getOption', 'rowsPerPage'));
 
 							$("#activityAddForm")[0].reset();
 
@@ -95,30 +95,28 @@
 				})
 			})
 
-			//为删除按钮添加事件，执行删除请求。
+			//为【删除】按钮添加事件，执行删除请求。
 			$("#deleteBtn").on("click",function () {
-				if (confirm("您确定删除选中的信息吗？")){
-					var $qx = $("input[name=xz]:checked");
-					if ($qx.length == 0 ){
-						alert("请选择你要删除的数据!")
-					}else {
+				var $xz = $("input[name=xz]:checked");
+				if ($xz.length == 0 ){
+					alert("请选择你要删除的数据!")
+				}else {
+					if (confirm("您确定删除选中的信息吗？")){
 						var param = "";
-						for (var i=0;i<$qx.length;i++){
-
-							param += "id="+$($qx[i]).val();
-							if (i<$qx.length-1){
+						for (var i=0;i<$xz.length;i++){
+							param += "id="+$($xz[i]).val();
+							if (i<$xz.length-1){
 								param += "&";
 							}
 						}
 						$.ajax({
-							async:false,
 							url:"workbench/activity/delete.do",
 							type:"post",
 							data:param,
 							dataType:"json",
 							success:function (data) {
-								if (data.success()){
-									pageList(1,3)
+								if (data.success){
+									pageList(1,$("#activityPage").bs_pagination('getOption', 'rowsPerPage'));
 								}else {
 									alert("删除市场活动失败");
 								}
@@ -126,10 +124,9 @@
 						});
 					}
 				}
-
 			})
 
-			//为修改按钮添加事件，执行修改请求
+			//打开【修改】市场活动窗口，
 			$("#editBtn").on("click",function () {
 
 				var $xz = $("input[name=xz]:checked");
@@ -146,14 +143,60 @@
 						type:"get",
 						data:{"id":id},
 						dataType:"json",
-						success:function () {
+						success:function (data) {
 
+							var html = "";
+							$.each(data.uList,function (k,v) {
+								html += "<option value='"+v.id+"'>"+v.name+"</opcion>"
+							})
+
+							$("#edit-owner").html(html);
+
+							$("#edit-id").val(data.a.id);
+							$("#edit-name").val(data.a.name);
+							$("#edit-owner").val(data.a.owner);
+							$("#edit-startDate").val(data.a.startDate);
+							$("#edit-endDate").val(data.a.endDate);
+							$("#edit-cost").val(data.a.cost);
+							$("#edit-describe").val(data.a.description);
+
+							$("#editActivityModal").modal("show");
 						}
 					})
 				}
 			})
 
-			//为查询按钮绑定事件，执行条件查询请求。
+			//为更新按钮添加事件，执行更新请求。
+			$("#edit-update").on("click",function () {
+				$.ajax({
+					async: false,
+					url:"workbench/activity/editUpdate.do",
+					dataType: "json",
+					type: "post",
+					data: {
+						"id":$.trim($("#edit-id").val()),
+						"name":$.trim($("#edit-name").val()),
+						"owner":$.trim($("#edit-owner").val()),
+						"startDate":$.trim($("#edit-startDate").val()),
+						"endDate":$.trim($("#edit-endDate").val()),
+						"cost":$.trim($("#edit-cost").val()),
+						"describe":$.trim($("#edit-describe").val())
+					},
+					success:function (data) {
+						if (data.success){
+
+							pageList($("#activityPage").bs_pagination('getOption', 'currentPage')
+									,$("#activityPage").bs_pagination('getOption', 'rowsPerPage'));
+
+							$("#editActivityModal").modal("hide");
+						}else {
+							alert(data.message);
+						}
+					}
+				})
+			})
+
+			//为【查询】按钮绑定事件，执行条件查询请求。
 			$("#searchBtn").click(function () {
 
 				$("#hidden-name").val($.trim($("#search-name").val()));
@@ -161,7 +204,7 @@
 				$("#hidden-startDate").val($.trim($("#search-startDate").val()));
 				$("#hidden-endDate").val($.trim($("#search-endDate").val()));
 
-				pageList(1,3);
+				pageList(1,$("#activityPage").bs_pagination('getOption', 'rowsPerPage'));
 			})
 
 			//市场活动列表多条选择功能，
@@ -227,7 +270,7 @@
 						totalPages: totalPages,	//总页数
 						totalRows: data.total,	//总记录条数
 
-						visiblePageLinks: 3,	//显示几个卡片
+						visiblePageLinks: 4,	//显示几个卡片
 
 						showGoToPage: true,
 						showRowsPerPage: true,
@@ -326,28 +369,30 @@
 				<div class="modal-body">
 				
 					<form class="form-horizontal" role="form">
-					
+
+						<input type="hidden" id="edit-id"/>
+
 						<div class="form-group">
-							<label for="edit-marketActivityOwner" class="col-sm-2 control-label">所有者<span style="font-size: 15px; color: red;">*</span></label>
+							<label for="edit-owner" class="col-sm-2 control-label">所有者<span style="font-size: 15px; color: red;">*</span></label>
 							<div class="col-sm-10" style="width: 300px;">
 								<select class="form-control" id="edit-owner">
 
 								</select>
 							</div>
-                            <label for="edit-marketActivityName" class="col-sm-2 control-label">名称<span style="font-size: 15px; color: red;">*</span></label>
+                            <label for="edit-name" class="col-sm-2 control-label">名称<span style="font-size: 15px; color: red;">*</span></label>
                             <div class="col-sm-10" style="width: 300px;">
                                 <input type="text" class="form-control" id="edit-name">
                             </div>
 						</div>
 
 						<div class="form-group">
-							<label for="edit-startTime" class="col-sm-2 control-label">开始日期</label>
+							<label for="edit-startDate" class="col-sm-2 control-label">开始日期</label>
 							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control time" id="edit-startDate">
+								<input type="text" class="form-control time" id="edit-startDate" readonly>
 							</div>
-							<label for="edit-endTime" class="col-sm-2 control-label">结束日期</label>
+							<label for="edit-endDate" class="col-sm-2 control-label">结束日期</label>
 							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control time" id="edit-endDate">
+								<input type="text" class="form-control time" id="edit-endDate"readonly/>
 							</div>
 						</div>
 						
@@ -376,9 +421,7 @@
 		</div>
 	</div>
 	
-	
-	
-	
+
 	<div>
 		<div style="position: relative; left: 10px; top: -10px;">
 			<div class="page-header">

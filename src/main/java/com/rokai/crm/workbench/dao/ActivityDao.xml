@@ -4,6 +4,20 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.rokai.crm.workbench.dao.ActivityDao">
 
+    <update id="editUpdate">
+        update tbl_activity set owner=#{owner},name=#{name},startDate=#{startDate},endDate=#{endDate},
+                cost=#{cost},description=#{description},editTime=#{editTime},editBy=#{editBy} where id = #{id};
+    </update>
+
+    <select id="getById" resultType="activity">
+        select
+            *
+        from
+            tbl_activity
+        where
+            id = #{id}
+    </select>
+
     <delete id="delete">
         delete
         from
@@ -14,10 +28,6 @@
             #{id}
         </foreach>
     </delete>
-
-    <select id="getUserInfo" resultType="User">
-        select * from tbl_user;
-    </select>
 
     <insert id="save">
         insert into tbl_activity(id, owner,name,startDate,endDate,cost,description,createTime,createBy)

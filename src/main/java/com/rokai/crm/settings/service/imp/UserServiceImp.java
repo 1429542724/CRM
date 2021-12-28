@@ -8,11 +8,11 @@ import com.rokai.crm.utils.DateTimeUtil;
 import com.rokai.crm.utils.SqlSessionUtil;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class UserServiceImp implements UserService {
     UserDao userDao = SqlSessionUtil.getSqlSession().getMapper(UserDao.class);
-
 
     @Override
     public User login(String account, String password, String ip) throws UserException {
@@ -43,5 +43,11 @@ public class UserServiceImp implements UserService {
         }
 
         return user;
+    }
+
+    @Override
+    public List<User> getUserInfo() {
+        List<User> userInfo = userDao.getUserInfo();
+        return userInfo;
     }
 }

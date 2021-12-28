@@ -10,11 +10,13 @@ import java.util.Map;
 
 public interface ActivityService {
 
-    List<User> getUserInfo();
-
     boolean save(Activity activity) throws ActivityException;
 
     PaginationVO pageList(Map<String, Object> map);
 
     Boolean delete(String[] idS);
+
+    Map<String, Object> edit(String id);
+
+    Boolean editUpdate(Activity activity) throws ActivityException;
 }

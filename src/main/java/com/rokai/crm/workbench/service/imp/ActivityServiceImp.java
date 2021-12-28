@@ -1,6 +1,7 @@
 package com.rokai.crm.workbench.service.imp;
 
 import com.rokai.crm.exception.ActivityException;
+import com.rokai.crm.settings.dao.UserDao;
 import com.rokai.crm.settings.domain.User;
 import com.rokai.crm.utils.SqlSessionUtil;
 import com.rokai.crm.vo.PaginationVO;
@@ -9,6 +10,7 @@ import com.rokai.crm.workbench.dao.ActivityRemarkDao;
 import com.rokai.crm.workbench.domain.Activity;
 import com.rokai.crm.workbench.service.ActivityService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,12 +18,7 @@ public class ActivityServiceImp implements ActivityService {
 
     ActivityDao activityDao = SqlSessionUtil.getSqlSession().getMapper(ActivityDao.class);
     ActivityRemarkDao activityRemarkDao = SqlSessionUtil.getSqlSession().getMapper(ActivityRemarkDao.class);
-
-    @Override
-    public List<User> getUserInfo() {
-        List<User> userInfo = activityDao.getUserInfo();
-        return userInfo;
-    }
+    UserDao userDao = SqlSessionUtil.getSqlSession().getMapper(UserDao.class);
 
     @Override
     public boolean save(Activity activity) throws ActivityException {
@@ -55,7 +52,6 @@ public class ActivityServiceImp implements ActivityService {
 
     @Override
     public Boolean delete(String[] idS) {
-
         boolean flag = true;
 
         //查询出需要删除的备注的数量，
@@ -75,6 +71,34 @@ public class ActivityServiceImp implements ActivityService {
             flag = false;
         }
 
+        return flag;
+    }
+
+    @Override
+    public Map<String, Object> edit(String id) {
+        List<User> uList = userDao.getUserInfo();
+
+        Activity a = activityDao.getById(id);
+
+        Map<String,Object> map = new HashMap<>();
+        map.put("uList",uList);
+        map.put("a",a);
+        return map;
+    }
+
+    @Override
+    public Boolean editUpdate(Activity activity) throws ActivityException {
+        boolean flag = true;
+
+        if ("".equals(activity.getName())){
+            flag = false;
+            throw new ActivityException("修改市场活动失败！");
+        }
+        int state = activityDao.editUpdate(activity);
+        if (state != 1){
+            flag = false;
+            throw new ActivityException("修改市场活动失败！");
+        }
         return flag;
     }
 }

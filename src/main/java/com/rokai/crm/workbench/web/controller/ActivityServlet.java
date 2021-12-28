@@ -1,6 +1,8 @@
 package com.rokai.crm.workbench.web.controller;
 
 import com.rokai.crm.settings.domain.User;
+import com.rokai.crm.settings.service.UserService;
+import com.rokai.crm.settings.service.imp.UserServiceImp;
 import com.rokai.crm.utils.DateTimeUtil;
 import com.rokai.crm.utils.PrintJson;
 import com.rokai.crm.utils.ServiceFactory;
@@ -36,12 +38,69 @@ public class ActivityServlet extends HttpServlet {
             delete(request,response);
         }else if ("/workbench/activity/edit.do".equals(path)){
             edit(request,response);
+        }else if ("/workbench/activity/editUpdate.do".equals(path)){
+            editUpdate(request,response);
         }
 
     }
 
+    /**
+     * 更新市场活动列表操作，
+     * @param request   当前request对象，
+     * @param response  当前response对象。
+     */
+    private void editUpdate(HttpServletRequest request, HttpServletResponse response) {
+
+        System.out.println("进入更新市场活动信息操作");
+        String id = request.getParameter("id");
+        String name = request.getParameter("name");
+        String owner = request.getParameter("owner");
+        String startDate = request.getParameter("startDate");
+        String endDate = request.getParameter("endDate");
+        String cost = request.getParameter("cost");
+        String describe = request.getParameter("describe");
+        String editTime = DateTimeUtil.getSysTime();
+        String editBy = ((User) request.getSession().getAttribute("user")).getName();
+
+        Activity activity = new Activity();
+        activity.setId(id);
+        activity.setName(name);
+        activity.setOwner(owner);
+        activity.setStartDate(startDate);
+        activity.setEndDate(endDate);
+        activity.setCost(cost);
+        activity.setDescription(describe);
+        activity.setEditTime(editTime);
+        activity.setEditBy(editBy);
+
+        ActivityService activityService = (ActivityService) ServiceFactory.getService(new ActivityServiceImp());
+        try{
+            Boolean flag = activityService.editUpdate(activity);
+            PrintJson.printJsonFlag(response,flag);
+        }catch (Exception e){
+            e.printStackTrace();
+            String message = e.getMessage();
+            Map<String,Object> map = new HashMap<>();
+            map.put("success",false);
+            map.put("message",message);
+            PrintJson.printJsonObj(response,map);
+        }
+    }
+
+    /**
+     * 获取修改市场活动信息操作，
+     * @param request   当前request对象，
+     * @param response  当前response对象。
+     */
     private void edit(HttpServletRequest request, HttpServletResponse response) {
 
+        System.out.println("根据市场活动id，取得备注信息列表");
+        String id = request.getParameter("id");
+
+        ActivityService activityService = (ActivityService) ServiceFactory.getService(new ActivityServiceImp());
+        Map<String,Object> map = activityService.edit(id);
+
+        PrintJson.printJsonObj(response,map);
     }
 
     /**
@@ -148,7 +207,7 @@ public class ActivityServlet extends HttpServlet {
     private void getUserList(HttpServletRequest request, HttpServletResponse response) {
         System.out.println("取得用户信息列表");
 
-        ActivityService userInfo = (ActivityService) ServiceFactory.getService(new ActivityServiceImp());
+        UserService userInfo = (UserService) ServiceFactory.getService(new UserServiceImp());
         List<User> uList = userInfo.getUserInfo();
         PrintJson.printJsonObj(response,uList);
     }
