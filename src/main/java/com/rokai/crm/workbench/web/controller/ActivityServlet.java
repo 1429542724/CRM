@@ -9,7 +9,10 @@ import com.rokai.crm.utils.ServiceFactory;
 import com.rokai.crm.utils.UUIDUtil;
 import com.rokai.crm.vo.PaginationVO;
 import com.rokai.crm.workbench.domain.Activity;
+import com.rokai.crm.workbench.domain.ActivityRemark;
+import com.rokai.crm.workbench.service.ActivityRemarkService;
 import com.rokai.crm.workbench.service.ActivityService;
+import com.rokai.crm.workbench.service.imp.ActivityRemarkServiceImp;
 import com.rokai.crm.workbench.service.imp.ActivityServiceImp;
 
 import javax.servlet.ServletException;
@@ -40,7 +43,103 @@ public class ActivityServlet extends HttpServlet {
             edit(request,response);
         }else if ("/workbench/activity/editUpdate.do".equals(path)){
             editUpdate(request,response);
+        }else if ("/workbench/activity/detail.do".equals(path)){
+            detail(request,response);
+        }else if ("/workbench/activity/getRemark.do".equals(path)){
+            getRemark(request,response);
+        }else if ("/workbench/activity/deleteRemark.do".equals(path)){
+            deleteRemark(request,response);
+        }else if ("/workbench/activity/saveRemark.do".equals(path)){
+            saveRemark(request,response);
         }
+
+    }
+
+
+    /**
+     * 市场活动备注信息创建操作，
+     * @param request   当前request对象，
+     * @param response  当前response对象。
+     */
+    private void saveRemark(HttpServletRequest request, HttpServletResponse response) {
+
+
+        String remark = request.getParameter("remark");
+        String activityId = request.getParameter("id");
+        String id = UUIDUtil.getUUID();
+        String createTime = DateTimeUtil.getSysTime();
+        String createBy = ((User)request.getSession().getAttribute("user")).getName();
+
+        ActivityRemark activityRemark = new ActivityRemark();
+        activityRemark.setId(id);
+        activityRemark.setNoteContent(remark);
+        activityRemark.setCreateTime(createTime);
+        activityRemark.setCreateBy(createBy);
+        activityRemark.setActivityId(activityId);
+
+        ActivityService activityService = (ActivityService) ServiceFactory.getService(new ActivityServiceImp());
+        boolean flag = activityService.saveRemark(activityRemark);
+
+        Map<String,Object> map = new HashMap<>();
+        map.put("success",flag);
+        map.put("info",activityRemark);
+
+        PrintJson.printJsonObj(response,map);
+    }
+
+    /**
+     * 市场活动备注信息删除操作，
+     * @param request   当前request对象，
+     * @param response  当前response对象。
+     */
+    private void deleteRemark(HttpServletRequest request, HttpServletResponse response) {
+
+        System.out.println("获取市场活动备注删除操作");
+
+        String id = request.getParameter("id");
+
+        ActivityService activityService = (ActivityService) ServiceFactory.getService(new ActivityServiceImp());
+        boolean flag = activityService.deleteRemark(id);
+
+        PrintJson.printJsonFlag(response,flag);
+    }
+
+    /**
+     * 市场活动备注信息获取操作，
+     * @param request   当前request对象，
+     * @param response  当前response对象。
+     */
+    private void getRemark(HttpServletRequest request, HttpServletResponse response) {
+
+        System.out.println("获取市场活动备注操作");
+        String id = request.getParameter("id");
+
+        ActivityService activityService = (ActivityService) ServiceFactory.getService(new ActivityServiceImp());
+        List<ActivityRemark> aList = activityService.getRemark(id);
+
+        PrintJson.printJsonObj(response,aList);
+
+    }
+
+    /**
+     * 获取市场活动详细信息操作，
+     * @param request   当前request对象，
+     * @param response  当前response对象。
+     * @throws ServletException
+     * @throws IOException
+     */
+    private void detail(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        System.out.println("获取市场活动详细信息操作");
+
+        String id = request.getParameter("id");
+
+        ActivityService activityService = (ActivityService) ServiceFactory.getService(new ActivityServiceImp());
+        Activity activity = activityService.detail(id);
+
+
+        request.setAttribute("a",activity);
+        request.getRequestDispatcher("/workbench/activity/detail.jsp").forward(request,response);
 
     }
 

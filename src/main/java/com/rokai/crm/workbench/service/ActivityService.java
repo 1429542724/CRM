@@ -4,6 +4,7 @@ import com.rokai.crm.exception.ActivityException;
 import com.rokai.crm.settings.domain.User;
 import com.rokai.crm.vo.PaginationVO;
 import com.rokai.crm.workbench.domain.Activity;
+import com.rokai.crm.workbench.domain.ActivityRemark;
 
 import java.util.List;
 import java.util.Map;
@@ -19,4 +20,12 @@ public interface ActivityService {
     Map<String, Object> edit(String id);
 
     Boolean editUpdate(Activity activity) throws ActivityException;
+
+    Activity detail(String id);
+
+    List<ActivityRemark> getRemark(String id);
+
+    boolean deleteRemark(String id);
+
+    boolean saveRemark(ActivityRemark activityRemark);
 }

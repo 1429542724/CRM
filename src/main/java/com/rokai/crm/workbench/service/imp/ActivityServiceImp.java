@@ -8,6 +8,7 @@ import com.rokai.crm.vo.PaginationVO;
 import com.rokai.crm.workbench.dao.ActivityDao;
 import com.rokai.crm.workbench.dao.ActivityRemarkDao;
 import com.rokai.crm.workbench.domain.Activity;
+import com.rokai.crm.workbench.domain.ActivityRemark;
 import com.rokai.crm.workbench.service.ActivityService;
 
 import java.util.HashMap;
@@ -98,6 +99,45 @@ public class ActivityServiceImp implements ActivityService {
         if (state != 1){
             flag = false;
             throw new ActivityException("修改市场活动失败！");
+        }
+        return flag;
+    }
+
+    @Override
+    public Activity detail(String id) {
+        Activity activity = activityDao.detail(id);
+        return activity;
+    }
+
+    @Override
+    public List<ActivityRemark> getRemark(String id) {
+        List<ActivityRemark> aList = activityRemarkDao.getRemark(id);
+        return aList;
+    }
+
+    @Override
+    public boolean deleteRemark(String id) {
+        boolean flag = true;
+
+        int amount = activityRemarkDao.deleteRemark(id);
+        if (amount != 1){
+            flag = false;
+        }
+        return flag;
+    }
+
+    @Override
+    public boolean saveRemark(ActivityRemark activityRemark) {
+        boolean flag = true;
+
+        if ("".equals(activityRemark.getNoteContent())){
+            flag = false;
+            return flag;
+        }
+
+        int amount = activityRemarkDao.saveRemark(activityRemark);
+        if (amount != 1){
+            flag = false;
         }
         return flag;
     }

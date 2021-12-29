@@ -18,7 +18,7 @@
     -->
 
     <session-config>
-        <session-timeout>10</session-timeout>
+        <session-timeout>180</session-timeout>
     </session-config>
     <filter>
         <filter-name>EncodingFilter</filter-name>
@@ -64,5 +64,9 @@
         <url-pattern>/workbench/activity/delete.do</url-pattern>
         <url-pattern>/workbench/activity/edit.do</url-pattern>
         <url-pattern>/workbench/activity/editUpdate.do</url-pattern>
+        <url-pattern>/workbench/activity/detail.do</url-pattern>
+        <url-pattern>/workbench/activity/getRemark.do</url-pattern>
+        <url-pattern>/workbench/activity/deleteRemark.do</url-pattern>
+        <url-pattern>/workbench/activity/saveRemark.do</url-pattern>
     </servlet-mapping>
 </web-app>
