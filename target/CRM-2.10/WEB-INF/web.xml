@@ -39,7 +39,7 @@
         <url-pattern>*.jsp</url-pattern>
     </filter-mapping>
 
-    <!-- 用户控制 -->
+    <!-- 用户控制器 -->
     <servlet>
         <servlet-name>LoginServlet</servlet-name>
         <servlet-class>com.rokai.crm.settings.web.controller.LoginServlet</servlet-class>
@@ -68,5 +68,17 @@
         <url-pattern>/workbench/activity/getRemark.do</url-pattern>
         <url-pattern>/workbench/activity/deleteRemark.do</url-pattern>
         <url-pattern>/workbench/activity/saveRemark.do</url-pattern>
+        <url-pattern>/workbench/activity/updateRemark.do</url-pattern>
+    </servlet-mapping>
+
+    <!-- 线索控制器 -->
+    <servlet>
+        <servlet-name>ClueServlet</servlet-name>
+        <servlet-class>com.rokai.crm.workbench.web.controller.ClueServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>ClueServlet</servlet-name>
+        <url-pattern>/workbench/clue/xxx.do</url-pattern>
     </servlet-mapping>
 </web-app>

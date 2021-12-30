@@ -78,7 +78,7 @@
 						html += '<font color="gray">市场活动</font> <font color="gray">-</font> <b>'+"${a.name}"+'</b> <small style="color: gray;" id="s'+data.info.id+'"> '
 								+data.info.createTime+' 由'+data.info.createBy+'创建</small>';
 						html += '<div style="position: relative; left: 500px; top: -30px; height: 30px; width: 100px; display: none;">';
-						html += '<a class="myHref" href="javascript:void(0);"><span class="glyphicon glyphicon-edit" style="font-size: 20px; color: pink;"></span></a>';
+						html += '<a class="myHref" href="javascript:void(0);" onclick="editRemark(\''+data.info.id+'\')"><span class="glyphicon glyphicon-edit" style="font-size: 20px; color: pink;"></span></a>';
 						html += '&nbsp;&nbsp;&nbsp;&nbsp;';
 						html += '<a class="myHref" href="javascript:void(0);" onclick="deleteRemark(\''+data.info.id+'\')"><span class="glyphicon glyphicon-remove" style="font-size: 20px; color: pink;"></span></a>';
 						html += '</div>';
@@ -88,6 +88,28 @@
 						$("#remarkDiv").before(html);
 					}else {
 						alert("添加备注信息失败！");
+					}
+				}
+			});
+		})
+
+		//更新市场活动备注信息
+		$("#updateRemarkBtn").on("click",function () {
+			var $remarkId = $("#remarkId").val();
+			$.ajax({
+				url:"workbench/activity/updateRemark.do",
+				type:"post",
+				data:{"remarkId":$remarkId,"noteContent":$.trim($("#noteContent").val())},
+				dataType:"json",
+				success:function (data) {
+					if(data.success){
+						$("#e"+$remarkId).html(data.ac.noteContent)
+
+						$("#s"+$remarkId).html(data.ac.editTime+" 由"+data.ac.editBy+"修改");
+
+						$("#editRemarkModal").modal("hide");
+					}else {
+						alert("修改备注失败！")
 					}
 				}
 			});
@@ -129,19 +151,21 @@
 
 	//删除市场活动备注信息
 	function deleteRemark(id) {
-		$.ajax({
-			url:"workbench/activity/deleteRemark.do",
-			type: "post",
-			data: {"id":id},
-			dataType: "json",
-			success:function (data) {
-				if (data.success){
-					$("#"+id).remove();
-				}else {
-					alert("删除备注失败！");
+		if (confirm("确定要删除该备注吗？")){
+			$.ajax({
+				url:"workbench/activity/deleteRemark.do",
+				type: "post",
+				data: {"id":id},
+				dataType: "json",
+				success:function (data) {
+					if (data.success){
+						$("#"+id).remove();
+					}else {
+						alert("删除备注失败！");
+					}
 				}
-			}
-		})
+			})
+		}
 	}
 
 	//修改备注内容信息获取

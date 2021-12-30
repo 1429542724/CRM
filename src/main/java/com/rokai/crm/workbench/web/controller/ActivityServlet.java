@@ -10,9 +10,7 @@ import com.rokai.crm.utils.UUIDUtil;
 import com.rokai.crm.vo.PaginationVO;
 import com.rokai.crm.workbench.domain.Activity;
 import com.rokai.crm.workbench.domain.ActivityRemark;
-import com.rokai.crm.workbench.service.ActivityRemarkService;
 import com.rokai.crm.workbench.service.ActivityService;
-import com.rokai.crm.workbench.service.imp.ActivityRemarkServiceImp;
 import com.rokai.crm.workbench.service.imp.ActivityServiceImp;
 
 import javax.servlet.ServletException;
@@ -51,8 +49,41 @@ public class ActivityServlet extends HttpServlet {
             deleteRemark(request,response);
         }else if ("/workbench/activity/saveRemark.do".equals(path)){
             saveRemark(request,response);
+        }else if ("/workbench/activity/updateRemark.do".equals(path)){
+            updateRemark(request,response);
         }
 
+    }
+
+    /**
+     * 市场活动备注信息更新操作，
+     * @param request   当前request对象，
+     * @param response  当前response对象。
+     */
+    private void updateRemark(HttpServletRequest request, HttpServletResponse response) {
+
+        System.out.println("获取修改市场活动备注操作");
+
+        String remarkId = request.getParameter("remarkId");
+        String noteContent = request.getParameter("noteContent");
+        String editTime = DateTimeUtil.getSysTime();
+        String editBy = ((User)request.getSession().getAttribute("user")).getName();
+        String editFlag = "1";
+
+        ActivityRemark activityRemark = new ActivityRemark();
+        activityRemark.setId(remarkId);
+        activityRemark.setNoteContent(noteContent);
+        activityRemark.setEditTime(editTime);
+        activityRemark.setEditBy(editBy);
+        activityRemark.setEditFlag(editFlag);
+
+        ActivityService activityService = (ActivityService) ServiceFactory.getService(new ActivityServiceImp());
+        boolean flag = activityService.updateRemark(activityRemark);
+
+        Map<String,Object> map = new HashMap<>();
+        map.put("ac",activityRemark);
+        map.put("success",flag);
+        PrintJson.printJsonObj(response,map);
     }
 
 
@@ -63,6 +94,7 @@ public class ActivityServlet extends HttpServlet {
      */
     private void saveRemark(HttpServletRequest request, HttpServletResponse response) {
 
+        System.out.println("获取创建市场活动备注操作");
 
         String remark = request.getParameter("remark");
         String activityId = request.getParameter("id");

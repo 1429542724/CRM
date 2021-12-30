@@ -8,5 +8,6 @@ import com.rokai.crm.workbench.service.ActivityRemarkService;
 import java.util.List;
 
 public class ActivityRemarkServiceImp implements ActivityRemarkService {
-    ActivityRemarkDao activityRemarkDao = SqlSessionUtil.getSqlSession().getMapper(ActivityRemarkDao.class);
+
+    private ActivityRemarkDao activityRemarkDao = SqlSessionUtil.getSqlSession().getMapper(ActivityRemarkDao.class);
 }

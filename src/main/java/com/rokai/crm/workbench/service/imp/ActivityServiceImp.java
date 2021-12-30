@@ -17,9 +17,9 @@ import java.util.Map;
 
 public class ActivityServiceImp implements ActivityService {
 
-    ActivityDao activityDao = SqlSessionUtil.getSqlSession().getMapper(ActivityDao.class);
-    ActivityRemarkDao activityRemarkDao = SqlSessionUtil.getSqlSession().getMapper(ActivityRemarkDao.class);
-    UserDao userDao = SqlSessionUtil.getSqlSession().getMapper(UserDao.class);
+    private ActivityDao activityDao = SqlSessionUtil.getSqlSession().getMapper(ActivityDao.class);
+    private ActivityRemarkDao activityRemarkDao = SqlSessionUtil.getSqlSession().getMapper(ActivityRemarkDao.class);
+    private UserDao userDao = SqlSessionUtil.getSqlSession().getMapper(UserDao.class);
 
     @Override
     public boolean save(Activity activity) throws ActivityException {
@@ -137,6 +137,22 @@ public class ActivityServiceImp implements ActivityService {
 
         int amount = activityRemarkDao.saveRemark(activityRemark);
         if (amount != 1){
+            flag = false;
+        }
+        return flag;
+    }
+
+    @Override
+    public boolean updateRemark(ActivityRemark activityRemark) {
+        boolean flag = true;
+
+        if ("".equals(activityRemark.getNoteContent())){
+            flag = false;
+            return flag;
+        }
+
+        int state = activityRemarkDao.updateRemark(activityRemark);
+        if (state != 1){
             flag = false;
         }
         return flag;
