@@ -5,4 +5,138 @@
 
 <mapper namespace="com.rokai.crm.workbench.dao.ClueDao">
 
+    <insert id="saveClue">
+        insert into tbl_clue(
+            id,
+            fullname,
+            appellation,
+            owner,
+            company,
+            job,
+            email,
+            phone,
+            website,
+            mphone,
+            state,
+            source,
+            createBy,
+            createTime,
+            description,
+            contactSummary,
+            nextContactTime,
+            address
+            ) values(
+            #{id},
+            #{fullname},
+            #{appellation},
+            #{owner},
+            #{company},
+            #{job},
+            #{email},
+            #{phone},
+            #{website},
+            #{mphone},
+            #{state},
+            #{source},
+            #{createBy},
+            #{createTime},
+            #{description},
+            #{contactSummary},
+            #{nextContactTime},
+            #{address}
+            )
+    </insert>
+
+    <select id="getAllClue" resultType="Clue">
+        select c.id,c.fullname,c.company,c.phone,c.source,u.name as owner,c.mphone,c.state
+        from tbl_clue c
+        join tbl_user u
+        on c.owner = u.id
+
+        <where>
+            <if test="fullname!=null and fullname!=''">
+                c.fullname like '%' #{fullname} '%'
+            </if>
+
+            <if test="company!=null and company!=''">
+                and c.company like '%' #{company} '%'
+            </if>
+
+            <if test="phone!=null and phone!=''">
+                and c.phone like '%' #{phone} '%'
+            </if>
+
+            <if test="source!=null and source!=''">
+                and c.source like '%' #{source} '%'
+            </if>
+
+            <if test="owner!=null and owner!=''">
+                and u.name like '%' #{owner} '%'
+            </if>
+
+            <if test="mphone!=null and mphone!=''">
+                and c.mphone like '%' #{mphone} '%'
+            </if>
+
+            <if test="state!= null and state!=''">
+                and c.state like '%' #{state} '%'
+            </if>
+        </where>
+
+        order by c.createTime desc
+
+        limit #{pages},#{pageSize}
+    </select>
+
+    <select id="getClueTotal" resultType="int">
+        select
+            count(*)
+        from
+            tbl_clue c
+        join
+            tbl_user u
+        on
+            c.owner = u.id
+        <where>
+            <if test="fullname!=null and fullname!=''">
+                c.fullname like '%' #{fullname} '%'
+            </if>
+
+            <if test="company!=null and company!=''">
+                and c.company like '%' #{company} '%'
+            </if>
+
+            <if test="phone!=null and phone!=''">
+                and c.phone like '%' #{phone} '%'
+            </if>
+
+            <if test="source!=null and source!=''">
+                and c.source like '%' #{source} '%'
+            </if>
+
+            <if test="owner!=null and owner!=''">
+                and u.name like '%' #{owner} '%'
+            </if>
+
+            <if test="mphone!=null and mphone!=''">
+                and c.mphone like '%' #{mphone} '%'
+            </if>
+
+            <if test="state!= null and state!=''">
+                and c.state like '%' #{state} '%'
+            </if>
+        </where>
+    </select>
+
+    <delete id="deleteClue">
+        delete
+        from
+            tbl_clue
+        where
+            id in
+        <foreach collection="array" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
 </mapper>

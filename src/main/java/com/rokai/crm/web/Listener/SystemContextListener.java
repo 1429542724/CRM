@@ -17,17 +17,20 @@ public class SystemContextListener implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
 
-        System.out.println("服务区缓存\"数据字典\"开始，");
+        System.out.println("服务器缓存\"数据字典\"开始，");
+        long start = System.currentTimeMillis();
 
         ServletContext servletContext = sce.getServletContext();
         DicService dicService = (DicService) ServiceFactory.getService(new DicServiceImp());
 
         Map<String, List<DicValue>> map = dicService.getDicData();
         Set<String> set = map.keySet();
-        for (String key : set){
+        for (String key:set){
             servletContext.setAttribute(key,map.get(key));
         }
 
+        long end = System.currentTimeMillis();
+        System.out.println("服务器缓存\"数据字典\"结束，消耗时间("+(end - start) / 1000.00+")秒。");
     }
 
 }

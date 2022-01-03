@@ -86,6 +86,9 @@
 
     <servlet-mapping>
         <servlet-name>ClueServlet</servlet-name>
-        <url-pattern>/workbench/clue/xxx.do</url-pattern>
+        <url-pattern>/workbench/clue/getUserList.do</url-pattern>
+        <url-pattern>/workbench/clue/saveClue.do</url-pattern>
+        <url-pattern>/workbench/clue/getAllClueInfo.do</url-pattern>
+        <url-pattern>/workbench/clue/deleteClue.do</url-pattern>
     </servlet-mapping>
 </web-app>

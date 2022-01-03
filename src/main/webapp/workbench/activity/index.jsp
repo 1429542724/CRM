@@ -215,7 +215,6 @@
 
 			//市场活动列表单条或多条选择功能，
 			$("#activityBody").on("click",$("input[name=xz]"),function() {
-
 				$("#qx").prop("checked",$("input[name=xz]").length == $("input[name=xz]:checked").length);
 			})
 
@@ -436,7 +435,7 @@
 		<div style="position: relative; top: -20px; left: 0px; width: 100%; height: 100%;">
 			<div style="width: 100%; position: absolute;top: 5px; left: 10px;">
 
-				<div class="btn-toolbar" role="toolbar" style="height: 80px;">
+				<div class="btn-toolbar" role="toolbar" style="height: 50px;">
 					<form class="form-inline" role="form" style="position: relative;top: 8%; left: 5px;">
 
 						<div class="form-group">
@@ -471,14 +470,15 @@
 
 					</form>
 				</div>
+
 				<div class="btn-toolbar" role="toolbar" style="background-color: #F7F7F7; height: 50px; position: relative;top: 5px;">
 					<div class="btn-group" style="position: relative; top: 18%;">
 					  <button type="button" class="btn btn-primary" id="addBtn" ><span class="glyphicon glyphicon-plus"></span> 创建</button>
 					  <button type="button" class="btn btn-default" id="editBtn"><span class="glyphicon glyphicon-pencil"></span> 修改</button>
 					  <button type="button" class="btn btn-danger" id="deleteBtn"><span class="glyphicon glyphicon-minus"></span> 删除</button>
 					</div>
-
 				</div>
+
 				<div style="position: relative;top: 10px;">
 					<table class="table table-hover">
 						<thead>
@@ -509,7 +509,7 @@
 					</table>
 				</div>
 
-				<div style="height: 50px; position: relative;top: 30px;">
+				<div style="height: 50px; position: relative;top: 50px;">
 
 					<div id="activityPage">
 
@@ -518,5 +518,6 @@
 
 			</div>
 		</div>
+
 	</body>
 </html>
