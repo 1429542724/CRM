@@ -28,4 +28,26 @@
         </foreach>
     </delete>
 
+    <insert id="saveClueRemark">
+        insert into
+            tbl_clue_remark(id,noteContent,createBy,createTime,editFlag,clueId)
+        values(#{id},#{noteContent},#{createBy},#{createTime},#{editFlag},#{clueId})
+
+    </insert>
+
+    <select id="loadClueRemark" resultType="ClueRemark">
+        select * from tbl_clue_remark where clueId = #{clueId} order by createTime desc
+    </select>
+
+    <delete id="deleteRemarkD">
+        delete
+        from
+            tbl_clue_remark
+        where
+            id = #{clueRemarkId}
+    </delete>
+
+    <update id="updateClueRemark">
+        update tbl_clue_remark set noteContent = #{noteContent},editBy = #{editBy},editTime = #{editTime},editFlag = #{editFlag} where id = #{id}
+    </update>
 </mapper>

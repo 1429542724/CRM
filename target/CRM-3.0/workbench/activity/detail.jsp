@@ -1,11 +1,12 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
 	String basePath = request.getScheme() + "://" + request.getServerName() + ":"
-			+ request.getServerPort() + request.getContextPath() + "/";
+		+ request.getServerPort() + request.getContextPath() + "/";
 %>
 <html>
 <head>
 	<base href="<%=basePath%>">
+
 	<link href="jquery/bootstrap_3.3.0/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
 	<script type="text/javascript" src="jquery/jquery-1.11.1-min.js"></script>
 	<script type="text/javascript" src="jquery/bootstrap_3.3.0/js/bootstrap.min.js"></script>
@@ -74,7 +75,7 @@
 						html += '<div id="'+data.info.id+'"class="remarkDiv" style="height: 60px;">';
 						html += '<img title="zhangsan" src="image/user-thumbnail.png" style="width: 30px; height:30px;">';
 						html += '<div style="position: relative; top: -40px; left: 40px;" >';
-						html += '<h5 id="e'+data.info.id+'">'+data.info.noteContent+'</h5>';
+						html += '<h5><b>: </b><span id="e'+data.info.id+'">'+data.info.noteContent+'</span></h5>';
 						html += '<font color="gray">市场活动</font> <font color="gray">-</font> <b>'+"${a.name}"+'</b> <small style="color: gray;" id="s'+data.info.id+'"> '
 								+data.info.createTime+' 由'+data.info.createBy+'创建</small>';
 						html += '<div style="position: relative; left: 500px; top: -30px; height: 30px; width: 100px; display: none;">';
@@ -117,7 +118,7 @@
 
 	});
 
-	//加载市场活动详细信息
+	//加载市场活动详细信息备注
 	function loaDingRearm() {
 		var id = "${a.id}";
 		$.ajax({
@@ -132,7 +133,7 @@
 					html += '<div id="'+value.id+'"class="remarkDiv" style="height: 60px;">';
 					html += '<img title="zhangsan" src="image/user-thumbnail.png" style="width: 30px; height:30px;">';
 					html += '<div style="position: relative; top: -40px; left: 40px;" >';
-					html += '<h5 id="e'+value.id+'">'+value.noteContent+'</h5>';
+					html += '<h5><b>: </b><span id="e'+value.id+'">'+value.noteContent+'</span></h5>';
 					html += '<font color="gray">市场活动</font> <font color="gray">-</font> <b>'+"${a.name}"+'</b> <small style="color: gray;" id="s'+value.id+'"> '
 							+(value.editFlag==0?value.createTime:value.editTime)+' 由'+(value.editFlag==0?value.createBy:value.editBy)+''+(value.editFlag==0?"创建":"修改")+'</small>';
 					html += '<div style="position: relative; left: 500px; top: -30px; height: 30px; width: 100px; display: none;">';
@@ -178,6 +179,7 @@
 
 		$("#editRemarkModal").modal("show");
 	}
+
 </script>
 
 </head>

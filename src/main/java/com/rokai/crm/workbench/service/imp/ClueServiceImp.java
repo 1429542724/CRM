@@ -11,6 +11,7 @@ import com.rokai.crm.workbench.domain.Clue;
 import com.rokai.crm.workbench.domain.ClueRemark;
 import com.rokai.crm.workbench.service.ClueService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -81,6 +82,89 @@ public class ClueServiceImp implements ClueService {
         if (amount3 != array.length){
             flag = false;
             throw new ClueException("error 删除线索信息失败！");
+        }
+
+        return flag;
+    }
+
+    @Override
+    public Map<String,Object> modifyWin(String id) {
+
+        Clue clue = clueDao.getIdClue(id);
+        List<User> userInfo = userDao.getUserInfo();
+
+        Map<String,Object> map = new HashMap<>();
+        map.put("clueInfo",clue);
+        map.put("userInfo",userInfo);
+
+        return map;
+    }
+
+    @Override
+    public boolean updateClue(Clue clue) {
+        boolean flag = true;
+
+        int amount = clueDao.updateClue(clue);
+        if (amount < 1){
+            flag = false;
+        }
+
+        return flag;
+    }
+
+    @Override
+    public Clue detail(String id) {
+
+        Clue clue = clueDao.detail(id);
+        return clue;
+    }
+
+    @Override
+    public Boolean saveClueRemark(ClueRemark clueRemark) {
+
+        Boolean flag = true;
+
+        if ("".equals(clueRemark.getNoteContent())){
+            flag = false;
+            return flag;
+        }
+
+        int state = clueRemarkDao.saveClueRemark(clueRemark);
+        if (state != 1){
+            flag = false;
+            return flag;
+        }
+
+        return flag;
+    }
+
+    @Override
+    public List<ClueRemark> loadClueRemark(String clueId) {
+
+        List<ClueRemark> clueRemarkList = clueRemarkDao.loadClueRemark(clueId);
+        return clueRemarkList;
+    }
+
+    @Override
+    public boolean deleteClueRemark(String clueRemarkId) {
+
+        boolean flag = true;
+
+        int state = clueRemarkDao.deleteRemarkD(clueRemarkId);
+        if (state != 1){
+            flag = false;
+        }
+
+        return flag;
+    }
+
+    @Override
+    public boolean updateClueRemark(ClueRemark clueRemark) {
+        boolean flag = true;
+
+        int state = clueRemarkDao.updateClueRemark(clueRemark);
+        if (state != 1){
+            flag = false;
         }
 
         return flag;

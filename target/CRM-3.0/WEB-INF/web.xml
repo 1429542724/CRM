@@ -90,5 +90,12 @@
         <url-pattern>/workbench/clue/saveClue.do</url-pattern>
         <url-pattern>/workbench/clue/getAllClueInfo.do</url-pattern>
         <url-pattern>/workbench/clue/deleteClue.do</url-pattern>
+        <url-pattern>/workbench/clue/modifyWin.do</url-pattern>
+        <url-pattern>/workbench/clue/updateClue.do</url-pattern>
+        <url-pattern>/workbench/clue/detail.do</url-pattern>
+        <url-pattern>/workbench/clue/saveClueRemark.do</url-pattern>
+        <url-pattern>/workbench/clue/loadClueRemark.do</url-pattern>
+        <url-pattern>/workbench/clue/deleteClueRemark.do</url-pattern>
+        <url-pattern>/workbench/clue/updateClueRemark.do</url-pattern>
     </servlet-mapping>
 </web-app>

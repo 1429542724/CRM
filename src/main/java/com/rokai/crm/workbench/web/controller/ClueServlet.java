@@ -8,6 +8,7 @@ import com.rokai.crm.utils.ServiceFactory;
 import com.rokai.crm.utils.UUIDUtil;
 import com.rokai.crm.vo.PaginationVO;
 import com.rokai.crm.workbench.domain.Clue;
+import com.rokai.crm.workbench.domain.ClueRemark;
 import com.rokai.crm.workbench.service.ClueService;
 import com.rokai.crm.workbench.service.imp.ClueServiceImp;
 
@@ -35,12 +36,168 @@ public class ClueServlet extends HttpServlet {
             pagList(request,response);
         }else if ("/workbench/clue/deleteClue.do".equals(path)){
             deleteClue(request,response);
+        }else if ("/workbench/clue/modifyWin.do".equals(path)){
+            modifyWin(request,response);
+        }else if("/workbench/clue/updateClue.do".equals(path)){
+            updateClue(request,response);
+        }else if("/workbench/clue/detail.do".equals(path)){
+            detail(request,response);
+        }else if ("/workbench/clue/saveClueRemark.do".equals(path)){
+            saveClueRemark(request,response);
+        }else if ("/workbench/clue/loadClueRemark.do".equals(path)){
+            loadClueRemark(request,response);
+        }else if ("/workbench/clue/deleteClueRemark.do".equals(path)){
+            deleteClueRemark(request,response);
+        }else if ("/workbench/clue/updateClueRemark.do".equals(path)){
+            updateClueRemark(request,response);
         }
 
     }
 
     /**
-     * 删除线索信息功能
+     * 修改线索详细信息备注功能，
+     * @param request   当前request对象，
+     * @param response  当前response对象。
+     */
+    private void updateClueRemark(HttpServletRequest request, HttpServletResponse response) {
+
+        String clueRemarkId = request.getParameter("clueRemarkId");
+        String noteContent = request.getParameter("noteContent");
+
+        ClueRemark clueRemark = new ClueRemark();
+        clueRemark.setId(clueRemarkId);
+        clueRemark.setNoteContent(noteContent);
+        clueRemark.setEditFlag("1");
+        clueRemark.setEditTime(DateTimeUtil.getSysTime());
+        clueRemark.setEditBy(((User)request.getSession().getAttribute("user")).getName());
+
+        ClueService service = (ClueService) ServiceFactory.getService(new ClueServiceImp());
+        boolean flag = service.updateClueRemark(clueRemark);
+
+        PrintJson.printJsonFlag(response,flag);
+    }
+
+    /**
+     * 删除线索详细信息备注功能，
+     * @param request   当前request对象，
+     * @param response  当前response对象。
+     */
+    private void deleteClueRemark(HttpServletRequest request, HttpServletResponse response) {
+
+        String clueRemarkId = request.getParameter("clueRemarkId");
+
+        ClueService service = (ClueService) ServiceFactory.getService(new ClueServiceImp());
+        boolean flag = service.deleteClueRemark(clueRemarkId);
+
+        PrintJson.printJsonFlag(response,flag);
+    }
+
+    /**
+     * 加载线索详细信息备注功能，
+     * @param request   当前request对象，
+     * @param response  当前response对象。
+     */
+    private void loadClueRemark(HttpServletRequest request, HttpServletResponse response) {
+
+        String clueId = request.getParameter("clueId");
+
+        ClueService service = (ClueService) ServiceFactory.getService(new ClueServiceImp());
+        List<ClueRemark> clueRemarkList = service.loadClueRemark(clueId);
+
+        PrintJson.printJsonObj(response,clueRemarkList);
+    }
+
+    /**
+     * 保存线索详细信息备注功能，
+     * @param request   当前request对象，
+     * @param response  当前response对象。
+     */
+    private void saveClueRemark(HttpServletRequest request, HttpServletResponse response) {
+
+        String remark = request.getParameter("remark");
+        String clueId = request.getParameter("clueId");
+        ClueRemark clueRemark = new ClueRemark();
+        clueRemark.setId(UUIDUtil.getUUID());
+        clueRemark.setNoteContent(remark);
+        clueRemark.setCreateBy(((User) request.getSession().getAttribute("user")).getName());
+        clueRemark.setCreateTime(DateTimeUtil.getSysTime());
+        clueRemark.setEditFlag("0");
+        clueRemark.setClueId(clueId);
+
+        ClueService service = (ClueService) ServiceFactory.getService(new ClueServiceImp());
+        Boolean flag = service.saveClueRemark(clueRemark);
+
+        PrintJson.printJsonFlag(response,flag);
+
+    }
+
+    /**
+     * 获取详细信息页信息功能，
+     * @param request   当前request对象，
+     * @param response  当前response对象。
+     * @throws ServletException     控制器异常处理,
+     * @throws IOException      IO异常处理。
+     */
+    private void detail(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        String id = request.getParameter("id");
+        ClueService service = (ClueService) ServiceFactory.getService(new ClueServiceImp());
+        Clue clue = service.detail(id);
+
+        request.setAttribute("clue",clue);
+        request.getRequestDispatcher("/workbench/clue/detail.jsp").forward(request,response);
+    }
+
+    /**
+     * 更新线索信息功能，
+     * @param request   当前request对象，
+     * @param response  当前response对象。
+     */
+    private void updateClue(HttpServletRequest request, HttpServletResponse response) {
+
+        Clue clue = new Clue();
+        clue.setId(request.getParameter("id"));
+        clue.setOwner(request.getParameter("owner"));
+        clue.setCompany(request.getParameter("company"));
+        clue.setAppellation(request.getParameter("appellation"));
+        clue.setFullname(request.getParameter("fullname"));
+        clue.setJob(request.getParameter("job"));
+        clue.setEmail(request.getParameter("email"));
+        clue.setPhone(request.getParameter("phone"));
+        clue.setWebsite(request.getParameter("website"));
+        clue.setMphone(request.getParameter("mphone"));
+        clue.setState(request.getParameter("state"));
+        clue.setSource(request.getParameter("source"));
+        clue.setDescription(request.getParameter("description"));
+        clue.setContactSummary(request.getParameter("contactSummary"));
+        clue.setNextContactTime(request.getParameter("nextContactTime"));
+        clue.setAddress(request.getParameter("address"));
+        String editName = ((User)request.getSession().getAttribute("user")).getName();
+        clue.setEditBy(editName);
+        clue.setEditTime(DateTimeUtil.getSysTime());
+
+        ClueService service = (ClueService) ServiceFactory.getService(new ClueServiceImp());
+        boolean flag = service.updateClue(clue);
+
+        PrintJson.printJsonFlag(response,flag);
+    }
+
+    /**
+     * 获取修改线索窗口信息，
+     * @param request   当前request对象，
+     * @param response  当前response对象。
+     */
+    private void modifyWin(HttpServletRequest request, HttpServletResponse response) {
+
+        String id = request.getParameter("id");
+        ClueService service = (ClueService) ServiceFactory.getService(new ClueServiceImp());
+        Map<String,Object> map = service.modifyWin(id);
+
+        PrintJson.printJsonObj(response,map);
+    }
+
+    /**
+     * 删除线索信息功能，
      * @param request   当前request对象，
      * @param response  当前response对象。
      */
