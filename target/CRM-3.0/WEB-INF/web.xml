@@ -97,5 +97,12 @@
         <url-pattern>/workbench/clue/loadClueRemark.do</url-pattern>
         <url-pattern>/workbench/clue/deleteClueRemark.do</url-pattern>
         <url-pattern>/workbench/clue/updateClueRemark.do</url-pattern>
+        <url-pattern>/workbench/clue/loadClueActivityRelation.do</url-pattern>
+        <url-pattern>/workbench/clue/deleteRelation.do</url-pattern>
+        <url-pattern>/workbench/clue/getActivity.do</url-pattern>
+        <url-pattern>/workbench/clue/relation.do</url-pattern>
+        <url-pattern>/workbench/clue/convert.do</url-pattern>
+        <url-pattern>/workbench.clue/getActivityList.do</url-pattern>
+        <url-pattern>/workbench/clue/convertFunction.do</url-pattern>
     </servlet-mapping>
 </web-app>

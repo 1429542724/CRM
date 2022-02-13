@@ -234,7 +234,7 @@
 
 		});
 
-		//刷新线索信息列表
+		//刷新线索信息列表请求，
 		function pageList(pageNo,pageSize) {
 
 			$("#allSelect").prop("checked",false);

@@ -5,4 +5,7 @@
 
 <mapper namespace="com.rokai.crm.workbench.dao.ContactsActivityRelationDao">
 
+    <insert id="createRelation">
+        insert into tbl_contacts_activity_relation(id,contactsId,activityId) values(#{id},#{contactsId},#{activityId})
+    </insert>
 </mapper>

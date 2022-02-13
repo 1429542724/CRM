@@ -128,7 +128,7 @@
         </where>
     </select>
 
-    <delete id="deleteClue">
+    <delete id="deleteClueArray">
         delete
         from
             tbl_clue
@@ -198,4 +198,12 @@
             c.id = #{id} and c.owner = u.id
 
     </select>
+
+    <delete id="deleteClue">
+        delete
+        from
+            tbl_clue
+        where
+            id = #{clueId}
+    </delete>
 </mapper>

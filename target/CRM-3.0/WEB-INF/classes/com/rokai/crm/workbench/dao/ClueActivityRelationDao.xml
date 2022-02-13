@@ -5,4 +5,28 @@
 
 <mapper namespace="com.rokai.crm.workbench.dao.ClueActivityRelationDao">
 
+    <select id="getClueActivityRelation" resultType="Activity">
+        select
+            ta.*
+        from
+            tbl_clue_activity_relation tcar
+        join
+            tbl_activity ta
+        on
+            tcar.clueId = #{clueId} and ta.id = tcar.activityId
+
+    </select>
+
+    <delete id="deleteRelation">
+        delete from tbl_clue_activity_relation where clueId = #{clueId}
+    </delete>
+
+    <select id="getDeleteRelationAmount" resultType="int">
+        select
+            count(*)
+        from
+            tbl_clue_activity_relation
+        where
+            clueId = #{clueId}
+    </select>
 </mapper>

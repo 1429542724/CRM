@@ -5,4 +5,34 @@
 
 <mapper namespace="com.rokai.crm.workbench.dao.CustomerDao">
 
+    <select id="getCustomerIfExist" resultType="Customer">
+        select * from tbl_customer where name = #{company}
+    </select>
+
+    <insert id="createCustomer">
+        insert into tbl_customer(
+            id,
+            owner,
+            name,
+            website,
+            phone,
+            createBy,
+            createTime,
+            contactSummary,
+            nextContactTime,
+            description,
+            address)
+        values(
+            #{id},
+            #{owner},
+            #{name},
+            #{website},
+            #{phone},
+            #{createBy},
+            #{createTime},
+            #{contactSummary},
+            #{nextContactTime},
+            #{description},
+            #{address})
+    </insert>
 </mapper>

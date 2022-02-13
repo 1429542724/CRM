@@ -17,7 +17,7 @@
         </foreach>
     </select>
 
-    <delete id="deleteRemark">
+    <delete id="deleteRemarkArray">
         delete
         from
             tbl_clue_remark
@@ -39,7 +39,7 @@
         select * from tbl_clue_remark where clueId = #{clueId} order by createTime desc
     </select>
 
-    <delete id="deleteRemarkD">
+    <delete id="deleteRemark">
         delete
         from
             tbl_clue_remark
@@ -50,4 +50,77 @@
     <update id="updateClueRemark">
         update tbl_clue_remark set noteContent = #{noteContent},editBy = #{editBy},editTime = #{editTime},editFlag = #{editFlag} where id = #{id}
     </update>
+
+    <select id="loadClueActivityRelation" resultType="Activity">
+        select
+            car.id as id,
+            a.name,
+            a.startDate,
+            a.endDate,
+            u.name as owner
+        from
+            tbl_activity a
+        join
+            tbl_user u
+        on
+            a.owner = u.id
+        join
+            tbl_clue_activity_relation car
+        on
+            a.id = car.activityId
+        where
+            car.clueId = #{clueId}
+        order by a.startDate asc ;
+
+    </select>
+
+    <delete id="deleteRelation">
+        delete
+        from
+            tbl_clue_activity_relation
+        where
+            id = #{relationId};
+    </delete>
+
+    <insert id="relation">
+        insert into tbl_clue_activity_relation(id,clueId,activityId) values(#{id},#{clueId},#{activityId})
+    </insert>
+
+    <select id="getActivityList" resultType="Activity">
+        select
+            a.id,
+            a.name,
+            a.startDate,
+            a.endDate,
+            u.name as owner
+        from
+            tbl_activity a
+        join
+            tbl_user u
+        on
+            a.owner = u.id
+        where
+            a.name like '%' #{dimSearchFrame} '%'
+    </select>
+
+    <select id="getClueRemark" resultType="clueRemark">
+        select * from tbl_clue_remark where clueId = #{clueId}
+    </select>
+
+    <select id="getDeleteRemarkAmount" resultType="int">
+        select
+            count(*)
+        from
+            tbl_clue_remark
+        where
+            clueId = #{clueId}
+    </select>
+
+    <delete id="deleteRemarkClueId">
+        delete
+        from
+            tbl_clue_remark
+        where
+            clueId = #{clueId}
+    </delete>
 </mapper>

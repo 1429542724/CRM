@@ -30,4 +30,6 @@ public interface ActivityService {
     boolean saveRemark(ActivityRemark activityRemark);
 
     boolean updateRemark(ActivityRemark activityRemark);
+
+    Map<String, Object> getActivity(Map<String,Object> map);
 }

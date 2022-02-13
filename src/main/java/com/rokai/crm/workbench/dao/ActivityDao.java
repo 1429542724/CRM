@@ -20,4 +20,8 @@ public interface ActivityDao {
     int editUpdate(Activity activity);
 
     Activity detail(String id);
+
+    List<Activity> getActivity(Map<String,Object> map);
+
+    int getActivityCount(Map<String, Object> map);
 }

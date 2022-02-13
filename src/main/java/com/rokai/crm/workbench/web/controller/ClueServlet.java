@@ -1,15 +1,18 @@
 package com.rokai.crm.workbench.web.controller;
 
-import com.rokai.crm.exception.ClueException;
 import com.rokai.crm.settings.domain.User;
 import com.rokai.crm.utils.DateTimeUtil;
 import com.rokai.crm.utils.PrintJson;
 import com.rokai.crm.utils.ServiceFactory;
 import com.rokai.crm.utils.UUIDUtil;
 import com.rokai.crm.vo.PaginationVO;
+import com.rokai.crm.workbench.domain.Activity;
 import com.rokai.crm.workbench.domain.Clue;
 import com.rokai.crm.workbench.domain.ClueRemark;
+import com.rokai.crm.workbench.domain.Tran;
+import com.rokai.crm.workbench.service.ActivityService;
 import com.rokai.crm.workbench.service.ClueService;
+import com.rokai.crm.workbench.service.imp.ActivityServiceImp;
 import com.rokai.crm.workbench.service.imp.ClueServiceImp;
 
 import javax.servlet.ServletException;
@@ -34,7 +37,7 @@ public class ClueServlet extends HttpServlet {
             saveClue(request,response);
         }else if ("/workbench/clue/getAllClueInfo.do".equals(path)){
             pagList(request,response);
-        }else if ("/workbench/clue/deleteClue.do".equals(path)){
+        }else if ("/workbench/clue/deleteClueArray.do".equals(path)){
             deleteClue(request,response);
         }else if ("/workbench/clue/modifyWin.do".equals(path)){
             modifyWin(request,response);
@@ -50,8 +53,208 @@ public class ClueServlet extends HttpServlet {
             deleteClueRemark(request,response);
         }else if ("/workbench/clue/updateClueRemark.do".equals(path)){
             updateClueRemark(request,response);
+        }else if ("/workbench/clue/loadClueActivityRelation.do".equals(path)){
+            loadClueActivityRelation(request,response);
+        }else if ("/workbench/clue/deleteRelation.do".equals(path)){
+            deleteRelation(request,response);
+        }else if ("/workbench/clue/getActivity.do".equals(path)){
+            getActivity(request,response);
+        }else if ("/workbench/clue/relation.do".equals(path)){
+            relation(request,response);
+        }else if ("/workbench/clue/convert.do".equals(path)){
+            convert(request,response);
+        }else if ("/workbench.clue/getActivityList.do".equals(path)){
+            getActivityList(request,response);
+        }else if ("/workbench/clue/convertFunction.do".equals(path)){
+            convertFunction(request,response);
         }
 
+    }
+
+    /**
+     * 线索转换 - 获取线性转换信息，
+     * @param request   当前request对象，
+     * @param response  当前response对象。
+     */
+    private void convertFunction(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        String clueId = request.getParameter("clueId");
+        String company = request.getParameter("company");
+        String fullName = request.getParameter("fullName");
+        String appellation = request.getParameter("appellation");
+        String createDeal = request.getParameter("createDeal");
+        String owner = request.getParameter("owner");
+        String createBy = ((User) request.getSession().getAttribute("user")).getName();
+
+        Map<String,Object> map = new HashMap<>();
+        map.put("clueId",clueId);
+        map.put("company",company);
+        map.put("fullName",fullName);
+        map.put("appellation",appellation);
+        map.put("createDeal",createDeal);
+        map.put("owner",owner);
+        map.put("createBy",createBy);
+
+        String amountOfMoney = request.getParameter("amountOfMoney");
+        String tradeName = request.getParameter("tradeName");
+        String expectedClosingDate = request.getParameter("expectedClosingDate");
+        String stage = request.getParameter("stage");
+        String activity = request.getParameter("activity");
+        String hiddenActivityId = request.getParameter("hiddenActivityId");
+
+        Tran tran = new Tran();
+        tran.setId(UUIDUtil.getUUID());
+        tran.setOwner(owner);
+        tran.setMoney(amountOfMoney);
+        tran.setName(tradeName);
+        tran.setExpectedDate(expectedClosingDate);
+        tran.setCustomerId("");
+        tran.setStage(stage);
+        tran.setType("");
+        tran.setSource(activity);
+        tran.setActivityId(hiddenActivityId);
+        tran.setContactsId("");
+        tran.setCreateBy(createBy);
+        tran.setCreateTime("");
+        tran.setDescription("");
+        tran.setContactSummary("");
+        tran.setNextContactTime("");
+
+        ClueService service = (ClueService) ServiceFactory.getService(new ClueServiceImp());
+        boolean flag = service.convertFunction(map,tran);
+
+        PrintJson.printJsonFlag(response,flag);
+    }
+
+    /**
+     * 转换线索 - 搜索市场活动功能，
+     * @param request   当前request对象，
+     * @param response  当前response对象。
+     */
+    private void getActivityList(HttpServletRequest request, HttpServletResponse response) {
+
+        String dimSearchFrame = request.getParameter("DimSearchFrame");
+
+        ClueService service = (ClueService) ServiceFactory.getService(new ClueServiceImp());
+        List<Activity> list = service.getActivityList(dimSearchFrame);
+
+        PrintJson.printJsonObj(response,list);
+
+    }
+
+    /**
+     * 线索详细信息数据共享转换，
+     * @param request   当前request对象，
+     * @param response  当前response对象。
+     * @throws ServletException
+     * @throws IOException
+     */
+    private void convert(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        String clueId = request.getParameter("clueId");
+        String fullName = request.getParameter("fullName");
+        String company = request.getParameter("company");
+        String owner = request.getParameter("owner");
+        String appellation = request.getParameter("appellation");
+        String ownerId = request.getParameter("ownerId");
+
+        Map<String,Object> map = new HashMap<>();
+        map.put("clueId",clueId);
+        map.put("fullName",fullName);
+        map.put("company",company);
+        map.put("owner",owner);
+        map.put("appellation",appellation);
+        map.put("ownerId",ownerId);
+
+        request.setAttribute("map",map);
+        request.getRequestDispatcher("/workbench/clue/convert.jsp").forward(request,response);
+    }
+
+    /**
+     * 线索详细信息页市场活动关联功能，
+     * @param request   当前request对象，
+     * @param response  当前response对象，
+     */
+    private void relation(HttpServletRequest request, HttpServletResponse response) {
+
+        String clueId = request.getParameter("clueId");
+        String[] activityIds = request.getParameterValues("activityId");
+
+        ClueService service = (ClueService) ServiceFactory.getService(new ClueServiceImp());
+        Map<String,Object> map = service.relation(clueId,activityIds);
+
+        PrintJson.printJsonObj(response,map);
+    }
+
+    /**
+     * 获取线索详细信息页关联市场活动信息功能，
+     * @param request   当前request对象，
+     * @param response  当前response对象。
+     */
+    private void getActivity(HttpServletRequest request, HttpServletResponse response) {
+
+        String clueId = request.getParameter("clueId");
+        String dimName = request.getParameter("dimName");
+        String pageNoStr = request.getParameter("pageNo");
+        String pageSizeStr = request.getParameter("pageSize");
+        int pageSize = Integer.parseInt(pageSizeStr);
+
+        Integer skipCount = (Integer.parseInt(pageNoStr) -1) * pageSize;
+
+        Map<String,Object> map = new HashMap<>();
+        map.put("clueId",clueId);
+        map.put("dimName",dimName);
+        map.put("skipCount",skipCount);
+        map.put("pageSize",pageSize);
+
+        ActivityService service = (ActivityService) ServiceFactory.getService(new ActivityServiceImp());
+        Map<String,Object> rMap = service.getActivity(map);
+
+        PrintJson.printJsonObj(response,rMap);
+    }
+
+    /**
+     * 线索详细信息页市场活动删除功能，
+     * @param request   当前request对象，
+     * @param response  当前response对象。
+     */
+    private void deleteRelation(HttpServletRequest request, HttpServletResponse response) {
+
+        String relationId = request.getParameter("relationId");
+        try {
+            ClueService service = (ClueService) ServiceFactory.getService(new ClueServiceImp());
+            boolean flag = service.deleteRelation(relationId);
+
+            Map<String,Object> map = new HashMap<>();
+            map.put("flag",flag);
+            map.put("message","删除成功~");
+
+            PrintJson.printJsonObj(response,map);
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            String message = e.getMessage();
+            Map<String,Object> map = new HashMap<>();
+            map.put("flag",false);
+            map.put("message",message);
+
+            PrintJson.printJsonObj(response,map);
+        }
+    }
+
+    /**
+     * 加载线索详细信息市场活动关系功能，
+     * @param request   当前request对象，
+     * @param response  当前response对象。
+     */
+    private void loadClueActivityRelation(HttpServletRequest request, HttpServletResponse response) {
+
+        String clueId = request.getParameter("clueId");
+
+        ClueService service = (ClueService) ServiceFactory.getService(new ClueServiceImp());
+        List<Activity> list = service.loadClueActivityRelation(clueId);
+
+        PrintJson.printJsonObj(response,list);
     }
 
     /**

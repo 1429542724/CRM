@@ -22,6 +22,7 @@ public class UserServiceImp implements UserService {
         map.put("password",password);
 
         User user = userDao.login(map);
+
         if (user == null){
             throw new UserException("账号&密码错误！");
         }

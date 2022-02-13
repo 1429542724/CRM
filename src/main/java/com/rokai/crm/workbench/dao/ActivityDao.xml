@@ -129,4 +129,36 @@
             </if>
         </where>
     </select>
+
+    <select id="getActivity" resultType="Activity">
+        select
+            a.id,
+            a.name,
+            a.startDate,
+            a.endDate,
+            u.name as owner
+        from
+            tbl_activity a
+        join
+            tbl_user u
+        on
+            a.owner = u.id
+        where
+            a.name like '%' #{dimName} '%' and a.id not in(select activityId from tbl_clue_activity_relation where clueid = #{clueId})
+        ORDER BY
+            a.startDate ASC LIMIT #{skipCount},#{pageSize};
+    </select>
+
+    <select id="getActivityCount" resultType="int">
+        select
+            count(*)
+        from
+            tbl_activity a
+        join
+            tbl_user u
+        on
+            a.owner = u.id
+        where
+            a.name like '%' #{dimName} '%' and a.id not in(select activityId from tbl_clue_activity_relation where clueid = #{clueId})
+    </select>
 </mapper>

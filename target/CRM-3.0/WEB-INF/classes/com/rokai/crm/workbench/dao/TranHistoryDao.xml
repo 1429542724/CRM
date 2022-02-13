@@ -5,4 +5,23 @@
 
 <mapper namespace="com.rokai.crm.workbench.dao.TranHistoryDao">
 
+    <insert id="createHistory">
+        insert into tbl_tran_history(
+            id,
+            stage,
+            money,
+            expectedDate,
+            createTime,
+            createBy,
+            tranId)
+        values(
+            #{id},
+            #{stage},
+            #{money},
+            #{expectedDate},
+            #{createTime},
+            #{createBy},
+            #{tranId})
+    </insert>
+
 </mapper>

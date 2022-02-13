@@ -157,4 +157,25 @@ public class ActivityServiceImp implements ActivityService {
         }
         return flag;
     }
+
+    @Override
+    public Map<String, Object> getActivity(Map<String,Object> map) {
+
+        List<Activity> list = activityDao.getActivity(map);
+        int total = activityDao.getActivityCount(map);
+
+        Map<String, Object> rMap = new HashMap<>();
+        if (list == null){
+            rMap.put("success",false);
+            rMap.put("total",0);
+
+            return rMap;
+        }else {
+            rMap.put("success",true);
+            rMap.put("activityList",list);
+            rMap.put("total",total);
+        }
+
+        return rMap;
+    }
 }

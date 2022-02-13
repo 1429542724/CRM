@@ -43,7 +43,6 @@ public class LoginServlet extends HttpServlet {
 
         //获取ip地址，
         String ip = request.getRemoteAddr();
-        System.out.println("访问者的IP地址:\t"+ip);
 
         UserService userService = (UserService) ServiceFactory.getService(new UserServiceImp());
         try{

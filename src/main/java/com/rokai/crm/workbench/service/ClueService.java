@@ -3,8 +3,7 @@ package com.rokai.crm.workbench.service;
 import com.rokai.crm.exception.ClueException;
 import com.rokai.crm.settings.domain.User;
 import com.rokai.crm.vo.PaginationVO;
-import com.rokai.crm.workbench.domain.Clue;
-import com.rokai.crm.workbench.domain.ClueRemark;
+import com.rokai.crm.workbench.domain.*;
 
 import java.util.List;
 import java.util.Map;
@@ -32,4 +31,14 @@ public interface ClueService {
     boolean deleteClueRemark(String clueRemarkId);
 
     boolean updateClueRemark(ClueRemark clueRemark);
+
+    List<Activity> loadClueActivityRelation(String clueId);
+
+    boolean deleteRelation(String relationId) throws Exception;
+
+    Map<String, Object> relation(String clueId,String[] activityIds);
+
+    List<Activity> getActivityList(String dimSearchFrame);
+
+    boolean convertFunction(Map<String, Object> map, Tran tran);
 }
