@@ -1,4 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
 <%
 String basePath = request.getScheme() + "://" + request.getServerName() + ":"
 + request.getServerPort() + request.getContextPath() + "/";
@@ -7,30 +9,128 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":"
 <head>
 	<base href="<%=basePath%>">
 
-<link href="jquery/bootstrap_3.3.0/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
-<link href="jquery/bootstrap-datetimepicker-master/css/bootstrap-datetimepicker.min.css" type="text/css" rel="stylesheet" />
+	<link href="jquery/bootstrap_3.3.0/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
+	<link href="jquery/bootstrap-datetimepicker-master/css/bootstrap-datetimepicker.min.css" type="text/css" rel="stylesheet" />
 
-<script type="text/javascript" src="jquery/jquery-1.11.1-min.js"></script>
-<script type="text/javascript" src="jquery/bootstrap_3.3.0/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="jquery/bootstrap-datetimepicker-master/js/bootstrap-datetimepicker.min.js"></script>
-<script type="text/javascript" src="jquery/bootstrap-datetimepicker-master/locale/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script type="text/javascript" src="jquery/jquery-1.11.1-min.js"></script>
+	<script type="text/javascript" src="jquery/bootstrap_3.3.0/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="jquery/bootstrap-datetimepicker-master/js/bootstrap-datetimepicker.js"></script>
+	<script type="text/javascript" src="jquery/bootstrap-datetimepicker-master/locale/bootstrap-datetimepicker.zh-CN.js"></script>
 
-<script type="text/javascript">
+	<link rel="stylesheet" type="text/css" href="jquery/bs_pagination/jquery.bs_pagination.min.css">
+	<script type="text/javascript" src="jquery/bs_pagination/jquery.bs_pagination.min.js"></script>
+	<script type="text/javascript" src="jquery/bs_pagination/en.js"></script>
 
-	$(function(){
-		
-		//定制字段
-		$("#definedColumns > li").click(function(e) {
-			//防止下拉菜单消失
-	        e.stopPropagation();
-	    });
-		
-	});
-	
-</script>
+	<script type="text/javascript">
+
+		$(function(){
+
+			//定制字段
+			$("#definedColumns > li").click(function(e) {
+				//防止下拉菜单消失
+				e.stopPropagation();
+			});
+
+			//日期组件
+			$(".time").datetimepicker({
+				minView: "month",
+				language:  'zh-CN',
+				format: 'yyyy-mm-dd',
+				autoclose: true,
+				todayBtn: true,
+				pickerPosition: "bottom-left"
+			});
+
+			//初始化联系人信息，
+			getContactsPage(1,5);
+
+			//为查询按钮绑定事件，执行查询功能。
+			$("#searchBtn").on("click",function () {
+
+				$("#hidden-owner").val($.trim($("#search-owner").val()));
+				$("#hidden-name").val($.trim($("#search-name").val()));
+				$("#hidden-customerName").val($.trim($("#search-customerName").val()));
+				$("#hidden-source").val($.trim($("#search-source").val()));
+				$("#hidden-birth").val($.trim($("#search-birth").val()));
+
+				getContactsPage(1,5);
+
+				return false;
+			})
+
+		});
+
+		function getContactsPage(pages,pageNum){
+			$("#search-owner").val($("#hidden-owner").val());
+			$("#search-name").val($("#hidden-name").val());
+			$("#search-customerName").val($("#hidden-customerName").val());
+			$("#search-source").val($("#hidden-source").val());
+			$("#search-birth").val($("#hidden-birth").val());
+
+			$.ajax({
+				url:"workbench/contacts/getContactsPage.do",
+				type:"get",
+				data:{
+					"pages":pages,
+					"pageNum":pageNum,
+					"owner":$.trim($("#hidden-owner").val()),
+					"name":$.trim($("#hidden-name").val()),
+					"customerName":$.trim($("#hidden-customerName").val()),
+					"source":$.trim($("#hidden-source").val()),
+					"birth":$.trim($("#hidden-birth").val()),
+				},
+				dataType:"json",
+				success:function (data) {
+
+					var html = "";
+					$.each(data.dataList,function (key,value) {
+						html += '<tr class="active">';
+						html += '<td><input type="checkbox" '+value.id+'/></td>';
+						html += '<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href=\'workbench/contacts/detail.jsp\';">'+value.fullname+'</a></td>';
+						html += '<td>'+value.customerId+'</td>';
+						html += '<td>'+value.owner+'</td>';
+						html += '<td>'+value.source+'</td>';
+						html += '<td>'+value.birth+'</td>';
+						html += '</tr>';
+					})
+
+					$("#contactsTbody").html(html);
+
+					var totalPages = data.total % pageNum==0 ? data.total/pageNum:parseInt(data.total/pageNum)+1;
+
+					$("#contactsDiv").bs_pagination({
+						currentPage: pages,	//页码
+						rowsPerPage:pageNum,	//每页显示的记录条数
+						maxRowsPerPage: 20,	//每页最多显示的记录条数
+						totalPages: totalPages,	//总页数
+						totalRows: data.total,	//总记录条数
+
+						visiblePageLinks: 4,	//显示几个卡片
+
+						showGoToPage: true,
+						showRowsPerPage: true,
+						showRowsInfo: true,
+						showRowsDefaultInfo: true,
+
+						onChangePage:function (event,data) {
+							getContactsPage(data.currentPage,data.rowsPerPage);
+						}
+					});
+
+				}
+			});
+
+		}
+	</script>
 </head>
 <body>
 
+	<%-- 隐藏作用域 --%>
+	<input type="hidden" id="hidden-owner">
+	<input type="hidden" id="hidden-name">
+	<input type="hidden" id="hidden-customerName">
+	<input type="hidden" id="hidden-source">
+	<input type="hidden" id="hidden-birth">
 	
 	<!-- 创建联系人的模态窗口 -->
 	<div class="modal fade" id="createContactsModal" role="dialog">
@@ -304,10 +404,7 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":"
 			</div>
 		</div>
 	</div>
-	
-	
-	
-	
+
 	
 	<div>
 		<div style="position: relative; left: 10px; top: -10px;">
@@ -327,58 +424,47 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":"
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">所有者</div>
-				      <input class="form-control" type="text">
+				      <input class="form-control" type="text" id="search-owner">
 				    </div>
 				  </div>
 				  
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">姓名</div>
-				      <input class="form-control" type="text">
+				      <input class="form-control" type="text" id="search-name">
 				    </div>
 				  </div>
 				  
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">客户名称</div>
-				      <input class="form-control" type="text">
+				      <input class="form-control" type="text" id="search-customerName">
 				    </div>
 				  </div>
-				  
-				  <br>
 				  
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">来源</div>
-				      <select class="form-control" id="edit-clueSource">
+				      <select class="form-control" id="search-source">
 						  <option></option>
-						  <option>广告</option>
-						  <option>推销电话</option>
-						  <option>员工介绍</option>
-						  <option>外部介绍</option>
-						  <option>在线商场</option>
-						  <option>合作伙伴</option>
-						  <option>公开媒介</option>
-						  <option>销售邮件</option>
-						  <option>合作伙伴研讨会</option>
-						  <option>内部研讨会</option>
-						  <option>交易会</option>
-						  <option>web下载</option>
-						  <option>web调研</option>
-						  <option>聊天</option>
+						  <c:forEach items="${source}" var="source">
+							<option value="${source.value}">${source.text}</option>
+						  </c:forEach>
 						</select>
 				    </div>
 				  </div>
+
+					<br>
 				  
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">生日</div>
-				      <input class="form-control" type="text">
+				      <input class="form-control" type="text" id="search-birth">
 				    </div>
 				  </div>
 				  
-				  <button type="submit" class="btn btn-default">查询</button>
-				  
+				  <button type="submit" class="btn btn-default" id="searchBtn">查询</button>
+
 				</form>
 			</div>
 			<div class="btn-toolbar" role="toolbar" style="background-color: #F7F7F7; height: 50px; position: relative;top: 10px;">
@@ -402,8 +488,8 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":"
 							<td>生日</td>
 						</tr>
 					</thead>
-					<tbody>
-						<tr>
+					<tbody id="contactsTbody">
+						<%--<tr>
 							<td><input type="checkbox" /></td>
 							<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='workbench/contacts/detail.jsp';">李四</a></td>
 							<td>动力节点</td>
@@ -418,43 +504,14 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":"
                             <td>zhangsan</td>
                             <td>广告</td>
                             <td>2000-10-10</td>
-                        </tr>
+                        </tr>--%>
 					</tbody>
 				</table>
 			</div>
-			
-			<div style="height: 50px; position: relative;top: 10px;">
-				<div>
-					<button type="button" class="btn btn-default" style="cursor: default;">共<b>50</b>条记录</button>
-				</div>
-				<div class="btn-group" style="position: relative;top: -34px; left: 110px;">
-					<button type="button" class="btn btn-default" style="cursor: default;">显示</button>
-					<div class="btn-group">
-						<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-							10
-							<span class="caret"></span>
-						</button>
-						<ul class="dropdown-menu" role="menu">
-							<li><a href="#">20</a></li>
-							<li><a href="#">30</a></li>
-						</ul>
-					</div>
-					<button type="button" class="btn btn-default" style="cursor: default;">条/页</button>
-				</div>
-				<div style="position: relative;top: -88px; left: 285px;">
-					<nav>
-						<ul class="pagination">
-							<li class="disabled"><a href="#">首页</a></li>
-							<li class="disabled"><a href="#">上一页</a></li>
-							<li class="active"><a href="#">1</a></li>
-							<li><a href="#">2</a></li>
-							<li><a href="#">3</a></li>
-							<li><a href="#">4</a></li>
-							<li><a href="#">5</a></li>
-							<li><a href="#">下一页</a></li>
-							<li class="disabled"><a href="#">末页</a></li>
-						</ul>
-					</nav>
+
+			<div style="height: 50px; position: relative;top: 50px;">
+				<div id="contactsDiv">
+
 				</div>
 			</div>
 			

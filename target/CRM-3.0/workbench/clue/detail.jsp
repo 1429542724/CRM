@@ -215,7 +215,7 @@
 				var html = "";
 				$.each(data,function (k,v) {
 					html += '<div id="'+v.id+'" class="remarkDiv" style="height: 60px;">';
-					html += '<img title="zhangsan" src="image/user-thumbnail.png" style="width: 30px; height:30px;">';
+					html += '<img title="'+v.createBy+'" src="image/user-thumbnail.png" style="width: 30px; height:30px;">';
 					html += '<div style="position: relative; top: -40px; left: 40px;" >';
 					html += '<h5><b>: </b><span id="nr'+v.id+'">'+v.noteContent+'</span></h5>';
 					html += '<font color="gray">线索</font> <font color="gray">-</font> <b>'+"${clue.fullname}${clue.appellation}-${clue.company}"+'</b> ' +

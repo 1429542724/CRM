@@ -41,4 +41,95 @@
             #{nextContactTime},
             #{address})
     </insert>
+
+    <select id="getContactsList" resultType="Contacts">
+        select
+            *
+        from
+            tbl_contacts
+        where
+            fullname like '%' #{contactsName} '%'
+    </select>
+
+    <select id="getContactsPageList" resultType="Contacts">
+        select
+            cs.id,
+            u.name as owner,
+            cs.source,
+            cr.name as customerId,
+            cs.fullname,
+            cs.birth
+        from
+            tbl_contacts cs
+        left join
+            tbl_user u
+        on
+            cs.owner = u.id
+        left join
+            tbl_customer cr
+        on
+            cs.customerId = cr.id
+        <where>
+            <if test="owner != '' and owner != null">
+                u.name like '%' #{owner} '%'
+            </if>
+
+            <if test="name != '' and name != null">
+                and cs.fullname like '%' #{name} '%'
+            </if>
+
+            <if test="customerName != '' and customerName != null">
+                and cr.name like '%' #{customerName} '%'
+            </if>
+
+            <if test="source != '' and source != null">
+                and cs.source like '%' #{source} '%'
+            </if>
+
+            <if test="birth != '' and birth != null">
+                and cs.birth like '%' #{birth} '%'
+            </if>
+        </where>
+
+        order by cs.createTime desc limit #{pages},#{pageNum}
+
+    </select>
+
+    <select id="getContactsPageCount" resultType="int">
+        select
+            count(*)
+        from
+            tbl_contacts cs
+        left join
+            tbl_user u
+        on
+            cs.owner = u.id
+        left join
+            tbl_customer cr
+        on
+            cs.customerId = cr.id
+        <where>
+            <if test="owner != '' and owner != null">
+                u.name like '%' #{owner} '%'
+            </if>
+
+            <if test="name != '' and name != null">
+                and cs.fullname like '%' #{name} '%'
+            </if>
+
+            <if test="customerName != '' and customerName != null">
+                and cr.name like '%' #{customerName} '%'
+            </if>
+
+            <if test="source != '' and source != null">
+                and cs.source like '%' #{source} '%'
+            </if>
+
+            <if test="birth != '' and birth != null">
+                and cs.birth like '%' #{birth} '%'
+            </if>
+        </where>
+
+    </select>
+
 </mapper>

@@ -72,7 +72,7 @@ public class ClueServiceImp implements ClueService {
     }
 
     @Override
-    public boolean deleteClue(String[] array) throws ClueException{
+    public boolean deleteClueArray(String[] array) throws ClueException{
         boolean flag = true;
 
         //查出需要删除的备注数量，
@@ -351,7 +351,7 @@ public class ClueServiceImp implements ClueService {
          */
         String createDeal = (String) map.get("createDeal");
         if ("1".equals(createDeal)){
-            tran.setCustomerId(customer.getId());
+            tran.setCustomerId(customerId);
             tran.setContactsId(contacts.getId());
             tran.setCreateTime(createTime);
 

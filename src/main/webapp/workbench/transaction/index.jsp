@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%
 String basePath = request.getScheme() + "://" + request.getServerName() + ":"
 + request.getServerPort() + request.getContextPath() + "/";
@@ -7,23 +8,87 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":"
 <head>
 	<base href="<%=basePath%>">
 
-<link href="jquery/bootstrap_3.3.0/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
-<link href="jquery/bootstrap-datetimepicker-master/css/bootstrap-datetimepicker.min.css" type="text/css" rel="stylesheet" />
+	<link href="jquery/bootstrap_3.3.0/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
+	<link href="jquery/bootstrap-datetimepicker-master/css/bootstrap-datetimepicker.min.css" type="text/css" rel="stylesheet" />
 
-<script type="text/javascript" src="jquery/jquery-1.11.1-min.js"></script>
-<script type="text/javascript" src="jquery/bootstrap_3.3.0/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="jquery/bootstrap-datetimepicker-master/js/bootstrap-datetimepicker.js"></script>
-<script type="text/javascript" src="jquery/bootstrap-datetimepicker-master/locale/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script type="text/javascript" src="jquery/jquery-1.11.1-min.js"></script>
+	<script type="text/javascript" src="jquery/bootstrap_3.3.0/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="jquery/bootstrap-datetimepicker-master/js/bootstrap-datetimepicker.js"></script>
+	<script type="text/javascript" src="jquery/bootstrap-datetimepicker-master/locale/bootstrap-datetimepicker.zh-CN.js"></script>
 
-<script type="text/javascript">
+	<link rel="stylesheet" type="text/css" href="jquery/bs_pagination/jquery.bs_pagination.min.css">
+	<script type="text/javascript" src="jquery/bs_pagination/jquery.bs_pagination.min.js"></script>
+	<script type="text/javascript" src="jquery/bs_pagination/en.js"></script>
 
-	$(function(){
-		
-		
-		
-	});
-	
-</script>
+	<script type="text/javascript">
+
+		$(function(){
+
+			//加载交易列表信息功能，
+			TransactionPageList(1,5);
+
+		});
+
+		//获取交易列表信息请求，
+		function TransactionPageList(pages,pageNum) {
+			$.ajax({
+				url:"workbench/transaction/getTransactionList.do",
+				type:"get",
+				data:{
+					"pages":pages,
+					"pageNum":pageNum,
+					"owner":$.trim($("#search-owner").val()),
+					"name":$.trim($("#search-name").val()),
+					"customerName":$.trim($("#search-customerName").val()),
+					"contactsName":$.trim($("#search-contactsName").val()),
+					"stage":$.trim($("#search-stage").val()),
+					"transactionType":$.trim($("#search-transactionType").val()),
+					"source":$.trim($("#search-source").val())
+				},
+				dataType:"json",
+				success:function (data) {
+
+					var html = "";
+
+					$.each(data.dataList,function (key,value) {
+						html += '<tr class="active">';
+						html += '<td><input type="checkbox" id="'+value.id+'"/></td>';
+						html += '<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href=\'workbench/transaction/getDetailInfo.do?tranId='+value.id+'\';">'+value.name+'</a></td>';
+						html += '<td>'+value.customerId+'</td>';
+						html += '<td>'+value.stage+'</td>';
+						html += '<td>'+value.type+'</td>';
+						html += '<td>'+value.owner+'</td>';
+						html += '<td>'+value.source+'</td>';
+						html += '<td>'+value.contactsId+'</td>';
+						html += '</tr>';
+					})
+
+					$("#transactionTbody").html(html);
+
+					var totalPages = data.total % pageNum==0 ? data.total/pageNum:parseInt(data.total/pageNum)+1;
+
+					$("#transactionPagination").bs_pagination({
+						currentPage: pages,		//页码
+						rowsPerPage:pageNum,	//每页显示的记录条数
+						maxRowsPerPage: 20,		//每页最多显示的记录条数
+						totalPages: totalPages,	//总页数
+						totalRows: data.total,	//总记录条数
+
+						visiblePageLinks: 4,	//显示几个卡片
+
+						showGoToPage: true,
+						showRowsPerPage: true,
+						showRowsInfo: true,
+						showRowsDefaultInfo: true,
+
+						onChangePage:function (event,data) {
+							TransactionPageList(data.currentPage,data.rowsPerPage);
+						}
+					});
+				}
+			})
+		}
+	</script>
 </head>
 <body>
 
@@ -47,40 +112,40 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":"
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">所有者</div>
-				      <input class="form-control" type="text">
+				      <input class="form-control" id="search-owner" type="text">
 				    </div>
 				  </div>
 				  
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">名称</div>
-				      <input class="form-control" type="text">
+				      <input class="form-control" id="search-name" type="text">
 				    </div>
 				  </div>
 				  
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">客户名称</div>
-				      <input class="form-control" type="text">
+				      <input class="form-control" id="search-customerName" type="text">
 				    </div>
 				  </div>
-				  
+
+					<div class="form-group">
+						<div class="input-group">
+							<div class="input-group-addon">联系人名称</div>
+							<input class="form-control" id="search-contactsName" type="text">
+						</div>
+					</div>
 				  <br>
 				  
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">阶段</div>
-					  <select class="form-control">
+					  <select class="form-control" id="search-stage">
 					  	<option></option>
-					  	<option>资质审查</option>
-					  	<option>需求分析</option>
-					  	<option>价值建议</option>
-					  	<option>确定决策者</option>
-					  	<option>提案/报价</option>
-					  	<option>谈判/复审</option>
-					  	<option>成交</option>
-					  	<option>丢失的线索</option>
-					  	<option>因竞争丢失关闭</option>
+					  	<c:forEach items="${stage}" var="c">
+							<option value="${c.value}">${c.text}</option>
+						</c:forEach>
 					  </select>
 				    </div>
 				  </div>
@@ -88,10 +153,11 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":"
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">类型</div>
-					  <select class="form-control">
+					  <select class="form-control" id="search-transactionType">
 					  	<option></option>
-					  	<option>已有业务</option>
-					  	<option>新业务</option>
+						  <c:forEach items="${transactionType}" var="t">
+							  <option value="${t.value}">${t.text}</option>
+						  </c:forEach>
 					  </select>
 				    </div>
 				  </div>
@@ -99,41 +165,23 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":"
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">来源</div>
-				      <select class="form-control" id="create-clueSource">
+				      <select class="form-control" id="search-clueSource">
 						  <option></option>
-						  <option>广告</option>
-						  <option>推销电话</option>
-						  <option>员工介绍</option>
-						  <option>外部介绍</option>
-						  <option>在线商场</option>
-						  <option>合作伙伴</option>
-						  <option>公开媒介</option>
-						  <option>销售邮件</option>
-						  <option>合作伙伴研讨会</option>
-						  <option>内部研讨会</option>
-						  <option>交易会</option>
-						  <option>web下载</option>
-						  <option>web调研</option>
-						  <option>聊天</option>
+						  <c:forEach items="${source}" var="c">
+							  <option value="${c.value}">${c.text}</option>
+						  </c:forEach>
 						</select>
 				    </div>
 				  </div>
 				  
-				  <div class="form-group">
-				    <div class="input-group">
-				      <div class="input-group-addon">联系人名称</div>
-				      <input class="form-control" type="text">
-				    </div>
-				  </div>
-				  
-				  <button type="submit" class="btn btn-default">查询</button>
+				  <button type="submit" class="btn btn-default" id="queryBtn">查询</button>
 				  
 				</form>
 			</div>
 			<div class="btn-toolbar" role="toolbar" style="background-color: #F7F7F7; height: 50px; position: relative;top: 10px;">
 				<div class="btn-group" style="position: relative; top: 18%;">
-				  <button type="button" class="btn btn-primary" onclick="window.location.href='workbench/transaction/save.jsp';"><span class="glyphicon glyphicon-plus"></span> 创建</button>
-				  <button type="button" class="btn btn-default" onclick="window.location.href='edit.html';"><span class="glyphicon glyphicon-pencil"></span> 修改</button>
+				  <button type="button" class="btn btn-primary" onclick="window.location.href='workbench/transaction/openSaveWindow.do';"><span class="glyphicon glyphicon-plus"></span> 创建</button>
+				  <button type="button" class="btn btn-default" onclick="window.location.href='edit.jsp';"><span class="glyphicon glyphicon-pencil"></span> 修改</button>
 				  <button type="button" class="btn btn-danger"><span class="glyphicon glyphicon-minus"></span> 删除</button>
 				</div>
 				
@@ -153,10 +201,10 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":"
 							<td>联系人名称</td>
 						</tr>
 					</thead>
-					<tbody>
-						<tr>
+					<tbody id="transactionTbody">
+						<%--<tr>
 							<td><input type="checkbox" /></td>
-							<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='detail.jsp';">动力节点-交易01</a></td>
+							<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='workbench/transaction/detail.jsp';">动力节点-交易01</a></td>
 							<td>动力节点</td>
 							<td>谈判/复审</td>
 							<td>新业务</td>
@@ -166,51 +214,24 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":"
 						</tr>
                         <tr class="active">
                             <td><input type="checkbox" /></td>
-                            <td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='detail.jsp';">动力节点-交易01</a></td>
+                            <td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='workbench/transaction/detail.jsp';">动力节点-交易01</a></td>
                             <td>动力节点</td>
                             <td>谈判/复审</td>
                             <td>新业务</td>
                             <td>zhangsan</td>
                             <td>广告</td>
                             <td>李四</td>
-                        </tr>
+                        </tr>--%>
 					</tbody>
 				</table>
 			</div>
-			
-			<div style="height: 50px; position: relative;top: 20px;">
-				<div>
-					<button type="button" class="btn btn-default" style="cursor: default;">共<b>50</b>条记录</button>
+
+			<div style="height: 50px; position: relative;top: 50px;">
+
+				<div id="transactionPagination">
+
 				</div>
-				<div class="btn-group" style="position: relative;top: -34px; left: 110px;">
-					<button type="button" class="btn btn-default" style="cursor: default;">显示</button>
-					<div class="btn-group">
-						<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-							10
-							<span class="caret"></span>
-						</button>
-						<ul class="dropdown-menu" role="menu">
-							<li><a href="#">20</a></li>
-							<li><a href="#">30</a></li>
-						</ul>
-					</div>
-					<button type="button" class="btn btn-default" style="cursor: default;">条/页</button>
-				</div>
-				<div style="position: relative;top: -88px; left: 285px;">
-					<nav>
-						<ul class="pagination">
-							<li class="disabled"><a href="#">首页</a></li>
-							<li class="disabled"><a href="#">上一页</a></li>
-							<li class="active"><a href="#">1</a></li>
-							<li><a href="#">2</a></li>
-							<li><a href="#">3</a></li>
-							<li><a href="#">4</a></li>
-							<li><a href="#">5</a></li>
-							<li><a href="#">下一页</a></li>
-							<li class="disabled"><a href="#">末页</a></li>
-						</ul>
-					</nav>
-				</div>
+
 			</div>
 			
 		</div>

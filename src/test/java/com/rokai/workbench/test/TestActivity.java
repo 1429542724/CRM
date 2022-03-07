@@ -20,9 +20,10 @@ public class TestActivity {
 
         try {
             ActivityService service = (ActivityService) ServiceFactory.getService(new ActivityServiceImp());
-            boolean flag = false;
-            flag = service.save(activity);
-//        boolean flag = false;
+
+            boolean flag = service.save(activity);
+
+            //boolean flag = false;
             System.out.println("预取结果:\t"+flag);
             Assert.assertEquals(flag,true);
         } catch (ActivityException e) {

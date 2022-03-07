@@ -5,4 +5,14 @@
 
 <mapper namespace="com.rokai.crm.workbench.dao.CustomerRemarkDao">
 
+    <delete id="removeCustomerRemarkArray">
+        delete
+        from
+            tbl_customer_remark
+        where
+            customerId in
+            <foreach collection="array" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+    </delete>
 </mapper>

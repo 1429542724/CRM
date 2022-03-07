@@ -8,9 +8,7 @@ import com.rokai.crm.utils.ServiceFactory;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class SystemContextListener implements ServletContextListener {
 
@@ -28,6 +26,24 @@ public class SystemContextListener implements ServletContextListener {
         for (String key:set){
             servletContext.setAttribute(key,map.get(key));
         }
+
+        /*-------------------------------------------------------------------------------------------*/
+
+        Map<String,String> stageMap = new HashMap<>();
+
+        ResourceBundle resourceBundle = ResourceBundle.getBundle("Stage2Possibility");
+        Enumeration<String> keys = resourceBundle.getKeys();
+
+        while(keys.hasMoreElements()){
+            //阶段
+            String key = keys.nextElement();
+            //可能性
+            String value = resourceBundle.getString(key);
+
+            stageMap.put(key,value);
+        }
+
+        servletContext.setAttribute("stageMap",stageMap);
 
         long end = System.currentTimeMillis();
         System.out.println("服务器缓存\"数据字典\"结束，消耗时间("+(end - start) / 1000.00+")秒。");

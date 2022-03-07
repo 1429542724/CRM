@@ -131,7 +131,7 @@
 				var html = "";
 				$.each(data,function (key,value) {
 					html += '<div id="'+value.id+'"class="remarkDiv" style="height: 60px;">';
-					html += '<img title="zhangsan" src="image/user-thumbnail.png" style="width: 30px; height:30px;">';
+					html += '<img title="'+value.createBy+'" src="image/user-thumbnail.png" style="width: 30px; height:30px;">';
 					html += '<div style="position: relative; top: -40px; left: 40px;" >';
 					html += '<h5><b>: </b><span id="e'+value.id+'">'+value.noteContent+'</span></h5>';
 					html += '<font color="gray">市场活动</font> <font color="gray">-</font> <b>'+"${a.name}"+'</b> <small style="color: gray;" id="s'+value.id+'"> '

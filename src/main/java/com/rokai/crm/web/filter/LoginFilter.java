@@ -1,6 +1,7 @@
 package com.rokai.crm.web.filter;
 
 import com.rokai.crm.settings.domain.User;
+import com.rokai.crm.utils.DateTimeUtil;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -12,7 +13,7 @@ public class LoginFilter implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
 
-        System.out.println("进入是否登录过滤检测");
+        System.out.println(DateTimeUtil.getSysTime()+" 进入是否登录过滤检测,");
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
 

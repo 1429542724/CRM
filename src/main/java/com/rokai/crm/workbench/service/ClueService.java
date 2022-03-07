@@ -16,7 +16,7 @@ public interface ClueService {
 
     PaginationVO<Clue> pageList(Map<String, Object> map);
 
-    boolean deleteClue(String[] array) throws ClueException;
+    boolean deleteClueArray(String[] array) throws ClueException;
 
     Map<String,Object> modifyWin(String id);
 

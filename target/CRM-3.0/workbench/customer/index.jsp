@@ -7,13 +7,17 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":"
 <head>
 	<base href="<%=basePath%>">
 
-<link href="jquery/bootstrap_3.3.0/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
-<link href="jquery/bootstrap-datetimepicker-master/css/bootstrap-datetimepicker.min.css" type="text/css" rel="stylesheet" />
+	<link href="jquery/bootstrap_3.3.0/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
+	<link href="jquery/bootstrap-datetimepicker-master/css/bootstrap-datetimepicker.min.css" type="text/css" rel="stylesheet" />
 
-<script type="text/javascript" src="jquery/jquery-1.11.1-min.js"></script>
-<script type="text/javascript" src="jquery/bootstrap_3.3.0/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="jquery/bootstrap-datetimepicker-master/js/bootstrap-datetimepicker.min.js"></script>
-<script type="text/javascript" src="jquery/bootstrap-datetimepicker-master/locale/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script type="text/javascript" src="jquery/jquery-1.11.1-min.js"></script>
+	<script type="text/javascript" src="jquery/bootstrap_3.3.0/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="jquery/bootstrap-datetimepicker-master/js/bootstrap-datetimepicker.js"></script>
+	<script type="text/javascript" src="jquery/bootstrap-datetimepicker-master/locale/bootstrap-datetimepicker.zh-CN.js"></script>
+
+	<link rel="stylesheet" type="text/css" href="jquery/bs_pagination/jquery.bs_pagination.min.css">
+	<script type="text/javascript" src="jquery/bs_pagination/jquery.bs_pagination.min.js"></script>
+	<script type="text/javascript" src="jquery/bs_pagination/en.js"></script>
 
 <script type="text/javascript">
 
@@ -24,12 +28,202 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":"
 			//防止下拉菜单消失
 	        e.stopPropagation();
 	    });
-		
+
+		//日期组件
+		$(".time").datetimepicker({
+			minView: "month",
+			language:  'zh-CN',
+			format: 'yyyy-mm-dd',
+			autoclose: true,
+			todayBtn: true,
+			pickerPosition: "bottom-left"
+		});
+
+		//初始化客户列表信息功能，
+		pageList(1,5);
+
+		//为查询按钮绑定事件，执行条件查询请求。
+		$("#searchBtn").on("click",function () {
+			$("#hidden-name").val($.trim($("#search-name").val()))
+			$("#hidden-owner").val($.trim($("#search-phone").val()))
+			$("#hidden-phone").val($.trim($("#search-webSite").val()))
+			$("#hidden-webSite").val($.trim($("#search-owner").val()))
+
+			pageList(1,5);
+
+			return false;
+		})
+
+		//客户列表多条选择功能，
+		$("#selectAll").on("click",function () {
+			$("input[name=xz]").prop("checked",this.checked)
+		})
+
+		//客户列表多条或单挑选择功能，
+		$("#customerTbody").on("click",function () {
+			$("#selectAll").prop("checked",$("input[name=xz]").length == $("input[name=xz]:checked").length);
+		})
+
+		//为创建按钮绑定事件，打开创建客户界面。
+		$("#createCustomerBtn").on("click",function () {
+			$.ajax({
+				url:"workbench/clue/getUserList.do",
+				tpye:"get",
+				dataType:"json",
+				success:function (data) {
+
+					var html = "";
+					$.each(data,function (key,value) {
+						html += "<option value='"+value.id+"'>"+value.name+"</option>";
+					})
+
+					$("#create-customerOwner").html(html);
+
+					var id = "${user.id}";
+					$("#create-customerOwner").val(id);
+
+					$("#createCustomerModal").modal("show");
+				}
+			});
+
+		});
+
+		//为保存按钮绑定事件，执行保存客户请求。
+		$("#create-saveBtn").on("click",function () {
+			$.ajax({
+				url:"workbench/customer/saveCustomer.do",
+				type:"post",
+				data:{
+                    "owner":$.trim($("#create-customerOwner").val()),
+                    "customerName":$.trim($("#create-customerName").val()),
+                    "website":$.trim($("#create-website").val()),
+                    "phone":$.trim($("#create-phone").val()),
+                    "describe":$.trim($("#create-describe").val()),
+                    "contactSummary":$.trim($("#create-contactSummary").val()),
+                    "nextContactTime":$.trim($("#create-nextContactTime").val()),
+                    "address":$.trim($("#create-address1").val())
+                },
+				dataType:"json",
+				success:function (data) {
+					if (data.flag){
+
+						pageList(1,$("#customerPage").bs_pagination('getOption', 'rowsPerPage'));
+
+						$("#createCustomerModal").modal("hide");
+
+						$("#create-form")[0].reset();
+
+					}else {
+						alert(data.message);
+					}
+				}
+			})
+		});
+
+		//为删除按钮绑定事件，执行删除客户请求。
+		$("#removeCustomerBtn").on("click",function () {
+
+			var $xz = $("input[name=xz]:checked");
+
+			if ($xz.length != 0){
+				if (window.confirm("确定要删除次客户吗？")){
+					var customerIdArray = "";
+
+					for (var i=0;i<$xz.length;i++){
+						customerIdArray += "customerId="+$($xz[i]).val();
+
+						if (i < $xz.length -1){
+							customerIdArray += "&";
+						}
+					}
+
+					$.ajax({
+						url:"workbench/customer/removeCustomer.do",
+						type:"post",
+						data:customerIdArray,
+						dataType:"json",
+						success:function (data) {
+							if (data.flag){
+								alert(data.message);
+
+								pageList(1,$("#customerPage").bs_pagination('getOption', 'rowsPerPage'));
+							}else {
+								alert(data.message);
+							}
+						}
+
+					})
+				}
+			}else {
+				alert("请选择需要删除的客户信息！");
+			}
+		})
+
 	});
-	
+
+	//获取客户列表信息请求，
+	function pageList(pages,pageNum) {
+
+	    $.ajax({
+            url:"workbench/customer/getCustomer.do",
+            type:"get",
+            data:{
+            	"pages":pages,
+				"pageNum":pageNum,
+				"name":$("#hidden-name").val(),
+				"owner":$("#hidden-owner").val(),
+				"phone":$("#hidden-phone").val(),
+				"webSite":$("#hidden-webSite").val()
+			},
+            dataType:"json",
+            success:function (data) {
+
+            	var html = "";
+            	$.each(data.dataList,function (index,value) {
+					html += '<tr class="active">';
+					html += '<td><input type="checkbox" name="xz" value="'+value.id+'"/></td>';
+					html += '<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href=\'detail.jsp\';">'+value.name+'</a></td>';
+					html += '<td>'+value.owner+'</td>';
+					html += '<td>'+value.phone+'</td>';
+					html += '<td>'+value.website+'</td>';
+					html += '</tr>';
+				})
+
+				$("#customerTbody").html(html);
+
+				var totalPages = data.total % pageNum==0 ? data.total/pageNum:parseInt(data.total/pageNum)+1;
+
+				$("#customerPage").bs_pagination({
+					currentPage: pages,		//页码
+					rowsPerPage:pageNum,	//每页显示的记录条数
+					maxRowsPerPage: 20,		//每页最多显示的记录条数
+					totalPages: totalPages,	//总页数
+					totalRows: data.total,	//总记录条数
+
+					visiblePageLinks: 4,	//显示几个卡片
+
+					showGoToPage: true,
+					showRowsPerPage: true,
+					showRowsInfo: true,
+					showRowsDefaultInfo: true,
+
+					onChangePage:function (event,data) {
+						pageList(data.currentPage,data.rowsPerPage);
+					}
+				});
+
+            }
+        })
+	}
+
 </script>
 </head>
 <body>
+	<%-- 隐藏作用域 --%>
+	<input type="hidden" id="hidden-name"/>
+	<input type="hidden" id="hidden-owner"/>
+	<input type="hidden" id="hidden-phone"/>
+	<input type="hidden" id="hidden-webSite"/>
 
 	<!-- 创建客户的模态窗口 -->
 	<div class="modal fade" id="createCustomerModal" role="dialog">
@@ -42,15 +236,15 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":"
 					<h4 class="modal-title" id="myModalLabel1">创建客户</h4>
 				</div>
 				<div class="modal-body">
-					<form class="form-horizontal" role="form">
+					<form class="form-horizontal" role="form" id="create-form">
 					
 						<div class="form-group">
 							<label for="create-customerOwner" class="col-sm-2 control-label">所有者<span style="font-size: 15px; color: red;">*</span></label>
 							<div class="col-sm-10" style="width: 300px;">
 								<select class="form-control" id="create-customerOwner">
-								  <option>zhangsan</option>
+								  <%--<option>zhangsan</option>
 								  <option>lisi</option>
-								  <option>wangwu</option>
+								  <option>wangwu</option>--%>
 								</select>
 							</div>
 							<label for="create-customerName" class="col-sm-2 control-label">名称<span style="font-size: 15px; color: red;">*</span></label>
@@ -75,7 +269,7 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":"
 								<textarea class="form-control" rows="3" id="create-describe"></textarea>
 							</div>
 						</div>
-						<div style="height: 1px; width: 103%; background-color: #D5D5D5; left: -13px; position: relative;"></div>
+						<div style="height: 1px; width: 102%; background-color: #D5D5D5; left: -13px; position: relative;"></div>
 
                         <div style="position: relative;top: 15px;">
                             <div class="form-group">
@@ -87,12 +281,12 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":"
                             <div class="form-group">
                                 <label for="create-nextContactTime" class="col-sm-2 control-label">下次联系时间</label>
                                 <div class="col-sm-10" style="width: 300px;">
-                                    <input type="text" class="form-control" id="create-nextContactTime">
+                                    <input type="text" class="form-control time" id="create-nextContactTime" readonly>
                                 </div>
                             </div>
                         </div>
 
-                        <div style="height: 1px; width: 103%; background-color: #D5D5D5; left: -13px; position: relative; top : 10px;"></div>
+                        <div style="height: 1px; width: 102%; background-color: #D5D5D5; left: -13px; position: relative; top : 10px;"></div>
 
                         <div style="position: relative;top: 20px;">
                             <div class="form-group">
@@ -107,7 +301,7 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":"
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-					<button type="button" class="btn btn-primary" data-dismiss="modal">保存</button>
+					<button type="button" class="btn btn-primary" id="create-saveBtn">保存</button>
 				</div>
 			</div>
 		</div>
@@ -125,7 +319,6 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":"
 				</div>
 				<div class="modal-body">
 					<form class="form-horizontal" role="form">
-					
 						<div class="form-group">
 							<label for="edit-customerOwner" class="col-sm-2 control-label">所有者<span style="font-size: 15px; color: red;">*</span></label>
 							<div class="col-sm-10" style="width: 300px;">
@@ -159,7 +352,7 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":"
 							</div>
 						</div>
 						
-						<div style="height: 1px; width: 103%; background-color: #D5D5D5; left: -13px; position: relative;"></div>
+						<div style="height: 1px; width: 102%; background-color: #D5D5D5; left: -13px; position: relative;"></div>
 
                         <div style="position: relative;top: 15px;">
                             <div class="form-group">
@@ -176,7 +369,7 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":"
                             </div>
                         </div>
 
-                        <div style="height: 1px; width: 103%; background-color: #D5D5D5; left: -13px; position: relative; top : 10px;"></div>
+                        <div style="height: 1px; width: 102%; background-color: #D5D5D5; left: -13px; position: relative; top : 10px;"></div>
 
                         <div style="position: relative;top: 20px;">
                             <div class="form-group">
@@ -197,8 +390,7 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":"
 		</div>
 	</div>
 	
-	
-	
+
 	
 	<div>
 		<div style="position: relative; left: 10px; top: -10px;">
@@ -212,46 +404,46 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":"
 	
 		<div style="width: 100%; position: absolute;top: 5px; left: 10px;">
 		
-			<div class="btn-toolbar" role="toolbar" style="height: 80px;">
+			<div class="btn-toolbar" role="toolbar" style="height: 50px;">
 				<form class="form-inline" role="form" style="position: relative;top: 8%; left: 5px;">
-				  
+
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">名称</div>
-				      <input class="form-control" type="text">
+				      <input class="form-control" type="text" id="search-name">
 				    </div>
 				  </div>
 				  
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">所有者</div>
-				      <input class="form-control" type="text">
+				      <input class="form-control" type="text" id="search-owner">
 				    </div>
 				  </div>
 				  
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">公司座机</div>
-				      <input class="form-control" type="text">
+				      <input class="form-control" type="text" id="search-phone">
 				    </div>
 				  </div>
 				  
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">公司网站</div>
-				      <input class="form-control" type="text">
+				      <input class="form-control" type="text" id="search-webSite">
 				    </div>
 				  </div>
 				  
-				  <button type="submit" class="btn btn-default">查询</button>
-				  
+				  <button type="button" class="btn btn-default" id="searchBtn">查询</button>
+
 				</form>
 			</div>
 			<div class="btn-toolbar" role="toolbar" style="background-color: #F7F7F7; height: 50px; position: relative;top: 5px;">
 				<div class="btn-group" style="position: relative; top: 18%;">
-				  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createCustomerModal"><span class="glyphicon glyphicon-plus"></span> 创建</button>
+				  <button type="button" class="btn btn-primary" id="createCustomerBtn"><span class="glyphicon glyphicon-plus"></span> 创建</button>
 				  <button type="button" class="btn btn-default" data-toggle="modal" data-target="#editCustomerModal"><span class="glyphicon glyphicon-pencil"></span> 修改</button>
-				  <button type="button" class="btn btn-danger"><span class="glyphicon glyphicon-minus"></span> 删除</button>
+				  <button type="button" class="btn btn-danger" id="removeCustomerBtn"><span class="glyphicon glyphicon-minus"></span> 删除</button>
 				</div>
 				
 			</div>
@@ -259,15 +451,15 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":"
 				<table class="table table-hover">
 					<thead>
 						<tr style="color: #B3B3B3;">
-							<td><input type="checkbox" /></td>
+							<td><input type="checkbox" id="selectAll" /></td>
 							<td>名称</td>
 							<td>所有者</td>
 							<td>公司座机</td>
 							<td>公司网站</td>
 						</tr>
 					</thead>
-					<tbody>
-						<tr>
+					<tbody id="customerTbody">
+						<%--<tr>
 							<td><input type="checkbox" /></td>
 							<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='detail.jsp';">动力节点</a></td>
 							<td>zhangsan</td>
@@ -280,43 +472,15 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":"
                             <td>zhangsan</td>
                             <td>010-84846003</td>
                             <td>http://www.bjpowernode.com</td>
-                        </tr>
+                        </tr>--%>
 					</tbody>
 				</table>
 			</div>
-			
-			<div style="height: 50px; position: relative;top: 30px;">
-				<div>
-					<button type="button" class="btn btn-default" style="cursor: default;">共<b>50</b>条记录</button>
-				</div>
-				<div class="btn-group" style="position: relative;top: -34px; left: 110px;">
-					<button type="button" class="btn btn-default" style="cursor: default;">显示</button>
-					<div class="btn-group">
-						<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-							10
-							<span class="caret"></span>
-						</button>
-						<ul class="dropdown-menu" role="menu">
-							<li><a href="#">20</a></li>
-							<li><a href="#">30</a></li>
-						</ul>
-					</div>
-					<button type="button" class="btn btn-default" style="cursor: default;">条/页</button>
-				</div>
-				<div style="position: relative;top: -88px; left: 285px;">
-					<nav>
-						<ul class="pagination">
-							<li class="disabled"><a href="#">首页</a></li>
-							<li class="disabled"><a href="#">上一页</a></li>
-							<li class="active"><a href="#">1</a></li>
-							<li><a href="#">2</a></li>
-							<li><a href="#">3</a></li>
-							<li><a href="#">4</a></li>
-							<li><a href="#">5</a></li>
-							<li><a href="#">下一页</a></li>
-							<li class="disabled"><a href="#">末页</a></li>
-						</ul>
-					</nav>
+
+			<div style="height: 50px; position: relative;top: 50px;">
+
+				<div id="customerPage">
+
 				</div>
 			</div>
 			

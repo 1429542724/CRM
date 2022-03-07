@@ -46,7 +46,7 @@
         <listener-class>com.rokai.crm.web.Listener.SystemContextListener</listener-class>
     </listener>
 
-    <!-- 用户控制器 -->
+    <!-- 用户模块控制器 -->
     <servlet>
         <servlet-name>LoginServlet</servlet-name>
         <servlet-class>com.rokai.crm.settings.web.controller.LoginServlet</servlet-class>
@@ -57,7 +57,8 @@
         <url-pattern>/settings/user/login.do</url-pattern>
     </servlet-mapping>
 
-    <!-- 市场活动控制器 -->
+
+    <!-- 市场活动模块控制器 -->
     <servlet>
         <servlet-name>ActivityServlet</servlet-name>
         <servlet-class>com.rokai.crm.workbench.web.controller.ActivityServlet</servlet-class>
@@ -78,7 +79,8 @@
         <url-pattern>/workbench/activity/updateRemark.do</url-pattern>
     </servlet-mapping>
 
-    <!-- 线索控制器 -->
+
+    <!-- 线索模块控制器 -->
     <servlet>
         <servlet-name>ClueServlet</servlet-name>
         <servlet-class>com.rokai.crm.workbench.web.controller.ClueServlet</servlet-class>
@@ -105,4 +107,55 @@
         <url-pattern>/workbench.clue/getActivityList.do</url-pattern>
         <url-pattern>/workbench/clue/convertFunction.do</url-pattern>
     </servlet-mapping>
+
+
+    <!-- 客户模块控制器 -->
+    <servlet>
+        <servlet-name>CustomerServlet</servlet-name>
+        <servlet-class>com.rokai.crm.workbench.web.controller.CustomerServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>CustomerServlet</servlet-name>
+        <url-pattern>/workbench/customer/getCustomer.do</url-pattern>
+        <url-pattern>/workbench/customer/saveCustomer.do</url-pattern>
+        <url-pattern>/workbench/customer/removeCustomer.do</url-pattern>
+    </servlet-mapping>
+
+
+    <!-- 交易模块控制器 -->
+    <servlet>
+        <servlet-name>TranServlet</servlet-name>
+        <servlet-class>com.rokai.crm.workbench.web.controller.TranServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>TranServlet</servlet-name>
+        <url-pattern>/workbench/transaction/openSaveWindow.do</url-pattern>
+        <url-pattern>/workbench/transaction/getCustomerName.do</url-pattern>
+        <url-pattern>/workbench/transaction/getContactsList.do</url-pattern>
+        <url-pattern>/workbench/transaction/getTransactionList.do</url-pattern>
+        <url-pattern>/workbench/transaction/saveTransaction.do</url-pattern>
+        <url-pattern>/workbench/transaction/getDetailInfo.do</url-pattern>
+        <url-pattern>/workbench/transaction/getTransactionHistoryInfo.do</url-pattern>
+        <url-pattern>/workbench/transaction/changeStage.do</url-pattern>
+        <url-pattern>/workbench/transaction/getRemarkInfo.do</url-pattern>
+        <url-pattern>/workbench/transaction/saveRemark.do</url-pattern>
+        <url-pattern>/workbench/transaction/editRemark.do</url-pattern>
+        <url-pattern>/workbench/transaction/deleteRemark.do</url-pattern>
+        <url-pattern>/workbench/transaction/getChartsInfo.do</url-pattern>
+    </servlet-mapping>
+
+
+    <!-- 联系人模块控制器 -->
+    <servlet>
+        <servlet-name>ContactsServlet</servlet-name>
+        <servlet-class>com.rokai.crm.workbench.web.controller.ContactsServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>ContactsServlet</servlet-name>
+        <url-pattern>/workbench/contacts/getContactsPage.do</url-pattern>
+    </servlet-mapping>
+
 </web-app>

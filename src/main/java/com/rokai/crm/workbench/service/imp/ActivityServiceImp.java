@@ -105,7 +105,9 @@ public class ActivityServiceImp implements ActivityService {
 
     @Override
     public Activity detail(String id) {
+
         Activity activity = activityDao.detail(id);
+
         return activity;
     }
 

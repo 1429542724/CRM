@@ -37,7 +37,7 @@ public class ClueServlet extends HttpServlet {
             saveClue(request,response);
         }else if ("/workbench/clue/getAllClueInfo.do".equals(path)){
             pagList(request,response);
-        }else if ("/workbench/clue/deleteClueArray.do".equals(path)){
+        }else if ("/workbench/clue/deleteClue.do".equals(path)){
             deleteClue(request,response);
         }else if ("/workbench/clue/modifyWin.do".equals(path)){
             modifyWin(request,response);
@@ -111,7 +111,7 @@ public class ClueServlet extends HttpServlet {
         tran.setCustomerId("");
         tran.setStage(stage);
         tran.setType("");
-        tran.setSource(activity);
+        tran.setSource("");
         tran.setActivityId(hiddenActivityId);
         tran.setContactsId("");
         tran.setCreateBy(createBy);
@@ -411,7 +411,7 @@ public class ClueServlet extends HttpServlet {
 
         ClueService service = (ClueService) ServiceFactory.getService(new ClueServiceImp());
         try {
-            boolean flag = service.deleteClue(idArray);
+            boolean flag = service.deleteClueArray(idArray);
             PrintJson.printJsonFlag(response, flag);
         } catch (Exception e) {
             e.printStackTrace();

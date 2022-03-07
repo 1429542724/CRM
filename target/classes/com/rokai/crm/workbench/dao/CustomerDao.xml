@@ -9,6 +9,71 @@
         select * from tbl_customer where name = #{company}
     </select>
 
+    <select id="getPageList" resultType="Customer">
+        select
+            c.id,
+            c.name,
+            u.name as owner,
+            c.phone,
+            c.website
+        from
+            tbl_customer c
+        join
+            tbl_user u
+        on
+            c.owner = u.id
+        <where>
+            <if test="name != null and name != ''">
+                c.name like '%' #{name} '%'
+            </if>
+
+            <if test="owner != null and owner != ''">
+                and u.name like '%' #{owner} '%'
+            </if>
+
+            <if test="phone != null and phone != ''">
+                and c.phone like '%' #{phone} '%'
+            </if>
+
+            <if test="website != null and website != ''">
+                and c.website like '%' #{webSite} '%'
+            </if>
+        </where>
+
+        order by c.createTime desc
+
+        limit #{skipCount},#{pageNum}
+
+    </select>
+
+    <select id="getPageListCount" resultType="int">
+        select
+            count(*)
+        from
+        tbl_customer c
+        join
+        tbl_user u
+        on
+        c.owner = u.id
+        <where>
+            <if test="name != null and name != ''">
+                c.name like '%' #{name} '%'
+            </if>
+
+            <if test="owner != null and owner != ''">
+                and u.name like '%' #{owner} '%'
+            </if>
+
+            <if test="phone != null and phone != ''">
+                and c.phone like '%' #{phone} '%'
+            </if>
+
+            <if test="website != null and website != ''">
+                and c.website like '%' #{website} '%'
+            </if>
+        </where>
+    </select>
+
     <insert id="createCustomer">
         insert into tbl_customer(
             id,
@@ -35,4 +100,19 @@
             #{description},
             #{address})
     </insert>
+
+    <delete id="removeCustomerArray">
+        delete
+        from
+            tbl_customer
+        where
+            id in
+        <foreach collection="array" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="getCustomerName" resultType="Customer">
+        select name from tbl_customer where name like '%' #{name} '%'
+    </select>
 </mapper>
